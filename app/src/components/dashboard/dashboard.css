@@ -524,6 +524,54 @@
   margin: 0 0 10px;
 }
 
+.draw-form {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.draw-help {
+  font: 500 11.5px/1.4 Barlow, sans-serif;
+  color: rgba(18, 41, 26, 0.55);
+  margin: 0 0 4px;
+}
+
+.draw-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.draw-row label {
+  width: 26px;
+  flex: none;
+  font: 700 11px Barlow, sans-serif;
+  color: var(--gold-2);
+}
+
+.draw-row select {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1px solid rgba(18, 41, 26, 0.2);
+  font: 500 12px Barlow, sans-serif;
+}
+
+.draw-error {
+  font: 600 11px Barlow, sans-serif;
+  color: #b3261e;
+}
+
+.draw-note {
+  font: 500 11px/1.4 Barlow, sans-serif;
+  color: rgba(18, 41, 26, 0.5);
+}
+
+.xy-foot {
+  padding: 10px 14px 14px;
+}
+
 .panel-note {
   padding: 12px 14px;
   border-top: 1px solid rgba(18, 41, 26, 0.08);

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
 import { QUARTER_SECONDS, initialState, sundaySeed } from "./seed";
-import { drawXY, finalTeams, saturdayComplete } from "./standings";
+import { buildXYDraw, finalTeams, saturdayComplete } from "./standings";
 
 const STORAGE_KEY = "pskpp-hoki-2026";
 
@@ -86,8 +86,13 @@ function baseReducer(state, action) {
     }
     case "RUN_DRAW": {
       if (!saturdayComplete(state) || state.xyDraw) return state;
-      const draw = drawXY(state);
+      const { groupToX1, groupToY1, groupToY2, x2Group } = action;
+      const draw = buildXYDraw(state, { groupToX1, groupToY1, groupToY2, x2Group });
       return { ...state, xyDraw: draw, sunday: sundaySeed(draw) };
+    }
+    case "CLEAR_XY_DRAW": {
+      if (state.sunday.some((m) => m.status !== "scheduled")) return state;
+      return { ...state, xyDraw: null, sunday: [] };
     }
     case "RESET": {
       return initialState();

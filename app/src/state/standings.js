@@ -60,16 +60,11 @@ export function saturdayComplete(state) {
   return state.saturday.every((m) => m.status === "finished");
 }
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-export function drawXY(state) {
+// Builds the X/Y draw from the actual physical draw results the secretariat
+// enters (which group's johan/naib landed in which slot), rather than
+// randomising it — the real draw is a lot-drawing ceremony, not a coin flip
+// the app should simulate.
+export function buildXYDraw(state, { groupToX1, groupToY1, groupToY2, x2Group }) {
   const groups = ["A", "B", "C"];
   const johan = {};
   const naib = {};
@@ -79,12 +74,11 @@ export function drawXY(state) {
     naib[g] = table[1].id;
   });
 
-  const [gX1, gY1, gY2] = shuffle(groups);
-  const [nX2, nX3] = shuffle([naib[gY1], naib[gY2]]);
+  const x3Group = x2Group === groupToY1 ? groupToY2 : groupToY1;
 
   return {
-    X: [johan[gX1], nX2, nX3],
-    Y: [johan[gY1], johan[gY2], naib[gX1]],
+    X: [johan[groupToX1], naib[x2Group], naib[x3Group]],
+    Y: [johan[groupToY1], johan[groupToY2], naib[groupToX1]],
   };
 }
 
