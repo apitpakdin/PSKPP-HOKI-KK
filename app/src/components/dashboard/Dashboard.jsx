@@ -7,6 +7,9 @@ import ScoreboardPanel from "./ScoreboardPanel";
 import SideColumn from "./SideColumn";
 import StandingsPanel from "./StandingsPanel";
 import XYFlowPanel from "./XYFlowPanel";
+import SchedulePanel from "./SchedulePanel";
+import TeamsPanel from "./TeamsPanel";
+import RefereesPanel from "./RefereesPanel";
 import "./dashboard.css";
 
 function defaultSelection(state) {
@@ -17,10 +20,20 @@ function defaultSelection(state) {
   return next ? next.m.id : all[0].m.id;
 }
 
+const TITLES = {
+  "papan-skor": "PAPAN SKOR",
+  jadual: "JADUAL PERLAWANAN",
+  kedudukan: "KEDUDUKAN KUMPULAN",
+  "peringkat-xy": "PERINGKAT XY",
+  pasukan: "PASUKAN & PEMAIN",
+  pengadil: "PENGADIL",
+};
+
 export default function Dashboard() {
   const state = useTournamentState();
   const dispatch = useTournamentDispatch();
   const [selectedId, setSelectedId] = useState(() => defaultSelection(state));
+  const [view, setView] = useState("papan-skor");
 
   const found = findMatch(state, selectedId) ?? findMatch(state, defaultSelection(state));
 
@@ -32,11 +45,11 @@ export default function Dashboard() {
   return (
     <div className="dash-shell">
       <div className="dash-frame">
-        <Sidebar />
+        <Sidebar active={view} onSelect={setView} />
         <main className="dash-main">
           <div className="dash-topbar">
             <div>
-              <div className="dash-h1">PAPAN SKOR</div>
+              <div className="dash-h1">{TITLES[view]}</div>
               <div className="dash-sub">
                 Sabtu 19 September 2026 · {doneSat}/9 perlawanan kumpulan selesai
               </div>
@@ -58,21 +71,54 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="dash-row">
-            <ScoreboardPanel
-              state={state}
-              selectedId={found?.m.id}
-              onSelect={setSelectedId}
-              match={found?.m}
-              list={found?.list}
-            />
-            <SideColumn state={state} />
-          </div>
+          {view === "papan-skor" && (
+            <>
+              <div className="dash-row">
+                <ScoreboardPanel
+                  state={state}
+                  selectedId={found?.m.id}
+                  onSelect={setSelectedId}
+                  match={found?.m}
+                  list={found?.list}
+                />
+                <SideColumn state={state} />
+              </div>
+              <div className="dash-row" style={{ alignItems: "stretch" }}>
+                <StandingsPanel state={state} />
+                <XYFlowPanel state={state} />
+              </div>
+            </>
+          )}
 
-          <div className="dash-row" style={{ alignItems: "stretch" }}>
-            <StandingsPanel state={state} />
-            <XYFlowPanel state={state} />
-          </div>
+          {view === "jadual" && (
+            <div className="dash-row">
+              <SchedulePanel state={state} />
+            </div>
+          )}
+
+          {view === "kedudukan" && (
+            <div className="dash-row">
+              <StandingsPanel state={state} />
+            </div>
+          )}
+
+          {view === "peringkat-xy" && (
+            <div className="dash-row">
+              <XYFlowPanel state={state} />
+            </div>
+          )}
+
+          {view === "pasukan" && (
+            <div className="dash-row">
+              <TeamsPanel state={state} />
+            </div>
+          )}
+
+          {view === "pengadil" && (
+            <div className="dash-row">
+              <RefereesPanel />
+            </div>
+          )}
         </main>
       </div>
       <Link to="/app" className="mobile-link">

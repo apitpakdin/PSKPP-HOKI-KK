@@ -1,13 +1,13 @@
 const NAV_ITEMS = [
-  "Papan skor",
-  "Jadual perlawanan",
-  "Kedudukan",
-  "Peringkat XY",
-  "Pasukan & pemain",
-  "Pengadil",
+  { id: "papan-skor", label: "Papan skor" },
+  { id: "jadual", label: "Jadual perlawanan" },
+  { id: "kedudukan", label: "Kedudukan" },
+  { id: "peringkat-xy", label: "Peringkat XY" },
+  { id: "pasukan", label: "Pasukan & pemain" },
+  { id: "pengadil", label: "Pengadil" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ active, onSelect }) {
   return (
     <aside className="dash-sidebar">
       <div>
@@ -20,9 +20,13 @@ export default function Sidebar() {
         <div className="dash-brand-year">2026</div>
       </div>
       <nav className="dash-nav">
-        {NAV_ITEMS.map((item, i) => (
-          <button key={item} className={`dash-nav-item ${i === 0 ? "active" : ""}`} disabled={i !== 0}>
-            {item}
+        {NAV_ITEMS.map((item) => (
+          <button
+            key={item.id}
+            className={`dash-nav-item ${item.id === active ? "active" : ""}`}
+            onClick={() => onSelect(item.id)}
+          >
+            {item.label}
           </button>
         ))}
       </nav>

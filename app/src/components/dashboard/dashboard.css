@@ -57,10 +57,15 @@
   border-radius: 8px;
   font: 600 12.5px Barlow, sans-serif;
   color: rgba(255, 255, 255, 0.4);
-  cursor: default;
+  cursor: pointer;
   border: none;
   background: none;
   text-align: left;
+}
+
+.dash-nav-item:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .dash-nav-item.active {
@@ -517,6 +522,67 @@
   font: 500 12px/1.5 Barlow, sans-serif;
   color: rgba(18, 41, 26, 0.6);
   margin: 0 0 10px;
+}
+
+.panel-note {
+  padding: 12px 14px;
+  border-top: 1px solid rgba(18, 41, 26, 0.08);
+  font: 500 12px Barlow, sans-serif;
+  color: rgba(18, 41, 26, 0.55);
+}
+
+.schedule-body {
+  padding: 6px 0;
+}
+
+.schedule-day-label {
+  padding: 10px 14px 4px;
+  font: 700 10px Barlow, sans-serif;
+  letter-spacing: 0.14em;
+  color: var(--gold-2);
+}
+
+.schedule-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-top: 1px solid rgba(18, 41, 26, 0.06);
+  font: 600 12.5px Barlow, sans-serif;
+  color: var(--ink);
+}
+
+.schedule-time {
+  width: 60px;
+  flex: none;
+  color: rgba(18, 41, 26, 0.5);
+  font-weight: 500;
+}
+
+.schedule-group {
+  width: 64px;
+  flex: none;
+  color: rgba(18, 41, 26, 0.5);
+  font-weight: 500;
+}
+
+.schedule-teams {
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-status {
+  flex: none;
+  font-weight: 700;
+  color: rgba(18, 41, 26, 0.5);
+}
+
+.schedule-status.status-live {
+  color: var(--gold-2);
+}
+
+.schedule-status.status-finished {
+  color: var(--ink);
 }
 
 .mobile-link {
