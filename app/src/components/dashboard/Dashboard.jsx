@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTournamentDispatch, useTournamentState } from "../../state/TournamentContext";
+import { useAuth } from "../../state/AuthContext";
 import { allMatchesWithList, findMatch } from "../../lib/matches";
 import Sidebar from "./Sidebar";
 import ScoreboardPanel from "./ScoreboardPanel";
@@ -32,6 +33,7 @@ const TITLES = {
 export default function Dashboard() {
   const state = useTournamentState();
   const dispatch = useTournamentDispatch();
+  const { signOut } = useAuth();
   const [selectedId, setSelectedId] = useState(() => defaultSelection(state));
   const [view, setView] = useState("papan-skor");
 
@@ -67,6 +69,9 @@ export default function Dashboard() {
                 }}
               >
                 Set semula
+              </button>
+              <button className="btn" onClick={() => signOut()}>
+                Log keluar
               </button>
             </div>
           </div>
