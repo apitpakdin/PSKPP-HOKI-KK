@@ -1,0 +1,43 @@
+:root {
+  --ink: #12291a;
+  --ink-2: #16321c;
+  --ink-3: #24512f;
+  --paper: #f4f2ec;
+  --gold: #e8b21e;
+  --gold-2: #c4930e;
+  --bg: #eae7df;
+  --text-dark: #17201a;
+
+  font-family: Barlow, system-ui, sans-serif;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-dark);
+  font-family: Barlow, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}

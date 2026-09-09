@@ -1,0 +1,587 @@
+.mobile-app {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ink-2);
+  color: #fff;
+  font-family: Barlow, sans-serif;
+  overflow: hidden;
+}
+
+.mobile-header {
+  padding: 18px 20px 16px;
+  background: var(--ink);
+  border-bottom: 3px solid var(--gold);
+}
+
+.mobile-eyebrow {
+  font: 600 9.5px Barlow, sans-serif;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.mobile-title {
+  font: 700 26px/1 Oswald, sans-serif;
+  color: #fff;
+}
+
+.mobile-subtitle {
+  font: 500 11px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 6px;
+}
+
+.day-toggle {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px 10px;
+  background: var(--ink-2);
+}
+
+.day-toggle button {
+  flex: 1;
+  text-align: center;
+  padding: 9px 0;
+  border-radius: 9px;
+  border: none;
+  font: 700 12px Barlow, sans-serif;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.day-toggle button.active {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.mobile-content {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--ink-2);
+  padding: 10px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 11px 13px;
+}
+
+.match-row.scheduled {
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  background: transparent;
+}
+
+.match-row.live {
+  background: var(--gold);
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(232, 178, 30, 0.22);
+}
+
+.match-time {
+  width: 46px;
+  text-align: center;
+}
+
+.match-time .t {
+  font: 600 15px Oswald, sans-serif;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.match-time .ampm {
+  font: 600 8.5px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.1em;
+}
+
+.match-row.live .match-time .t {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.match-row.live .match-time .ampm {
+  color: rgba(18, 41, 26, 0.6);
+}
+
+.match-divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.match-row.live .match-divider {
+  background: rgba(18, 41, 26, 0.22);
+}
+
+.match-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.match-group-label {
+  font: 600 8.5px Barlow, sans-serif;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+
+.match-row.scheduled .match-group-label {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.match-row.live .match-group-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #7a4a00;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b3261e;
+  flex: none;
+}
+
+.match-teamline {
+  display: flex;
+  justify-content: space-between;
+  font: 600 14px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.match-teamline.win {
+  color: #fff;
+}
+
+.match-row.live .match-teamline {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.match-score {
+  font: 700 14px Oswald, sans-serif;
+}
+
+.match-static-teams {
+  font: 600 14px/1.35 Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.match-status {
+  font: 600 8.5px Barlow, sans-serif;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.35);
+  align-self: flex-start;
+}
+
+.mobile-tabbar {
+  display: flex;
+  background: var(--ink);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 8px calc(14px + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-tabbar button {
+  flex: 1;
+  background: none;
+  border: none;
+  text-align: center;
+  font: 600 11px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.04em;
+  padding: 6px 2px 0;
+}
+
+.mobile-tabbar button.active {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.mobile-tabbar .underline {
+  height: 2px;
+  width: 26px;
+  background: var(--gold);
+  margin: 5px auto 0;
+}
+
+.empty-note {
+  font: 500 12px/1.5 Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+/* Kedudukan */
+.standings-group {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.standings-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--ink-3);
+  font: 700 12px Barlow, sans-serif;
+  color: #fff;
+  letter-spacing: 0.1em;
+}
+
+.standings-head.gold {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.standings-head span:last-child {
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.06em;
+}
+
+.standings-head.gold span:last-child {
+  color: rgba(18, 41, 26, 0.55);
+}
+
+.standings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.standings-row:first-of-type {
+  border-top: none;
+}
+
+.standings-row.qualified {
+  background: rgba(232, 178, 30, 0.12);
+}
+
+.standings-rank {
+  width: 18px;
+  font: 700 12px Oswald, sans-serif;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.standings-row.qualified .standings-rank {
+  color: var(--gold);
+}
+
+.standings-name {
+  flex: 1;
+  font: 600 14px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.standings-row.qualified .standings-name {
+  color: #fff;
+}
+
+.standings-meta {
+  font: 500 13px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.standings-row.qualified .standings-meta {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.standings-pts {
+  width: 22px;
+  text-align: right;
+  font: 700 14px Oswald, sans-serif;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.standings-row.qualified .standings-pts {
+  color: var(--gold);
+}
+
+.callout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 178, 30, 0.35);
+}
+
+.callout .diamond {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  flex: none;
+}
+
+.callout p {
+  margin: 0;
+  font: 500 12px/1.4 Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.callout b {
+  color: var(--gold);
+}
+
+/* Keputusan (live hero) */
+.live-hero {
+  padding: 18px 20px 20px;
+  background: var(--ink-3);
+  border-bottom: 3px solid var(--gold);
+  margin: -10px -14px 6px;
+}
+
+.live-hero-tag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 14px;
+  font: 700 9.5px Barlow, sans-serif;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+}
+
+.live-hero-tag .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.live-hero-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.live-hero-team {
+  flex: 1;
+}
+
+.live-hero-team.right {
+  text-align: right;
+}
+
+.live-hero-team .name {
+  font: 600 15px Barlow, sans-serif;
+  color: #fff;
+}
+
+.live-hero-team .seed {
+  font: 500 10px Barlow, sans-serif;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.live-hero-num {
+  font: 700 46px/1 Oswald, sans-serif;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.live-hero-num .dash {
+  color: rgba(255, 255, 255, 0.35);
+  padding: 0 6px;
+}
+
+.live-hero-quarters {
+  display: flex;
+  gap: 5px;
+  margin-top: 16px;
+}
+
+.live-hero-quarters div {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 2px;
+}
+
+.live-hero-quarters div.done {
+  background: var(--gold);
+}
+
+.live-hero-quarters div.current {
+  background: var(--gold);
+  opacity: 0.55;
+}
+
+.live-hero-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+  font: 600 10px Barlow, sans-serif;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.section-label {
+  font: 700 10px Barlow, sans-serif;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px 4px 2px;
+}
+
+.finished-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.finished-row .meta {
+  font: 600 8.5px Barlow, sans-serif;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
+}
+
+.finished-row .line {
+  display: flex;
+  justify-content: space-between;
+  font: 600 14px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.finished-row .line.winner {
+  color: #fff;
+}
+
+.finished-row .line .score {
+  font: 700 14px Oswald, sans-serif;
+}
+
+.finished-row .line.winner .score {
+  color: var(--gold);
+}
+
+/* Info tab */
+.info-hero {
+  padding: 16px 20px 20px;
+  background: var(--ink);
+  border-bottom: 3px solid var(--gold);
+  margin: -10px -14px 6px;
+}
+
+.info-title {
+  font: 700 32px/0.95 Oswald, sans-serif;
+  color: #fff;
+  margin-top: 6px;
+}
+
+.info-title .accent {
+  color: var(--gold);
+}
+
+.info-rule {
+  height: 2px;
+  width: 52px;
+  background: var(--gold);
+  margin: 12px 0 10px;
+}
+
+.info-tagline {
+  font: 500 12px/1.5 Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.info-grid {
+  display: flex;
+  gap: 10px;
+}
+
+.info-card {
+  flex: 1;
+  padding: 12px 13px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.info-card .label {
+  font: 600 8.5px Barlow, sans-serif;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+
+.info-card .value {
+  font: 600 14px/1.3 Barlow, sans-serif;
+  color: #fff;
+  margin-top: 4px;
+}
+
+.info-card .value .sub {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.tentatif-card {
+  padding: 13px 13px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.tentatif-title {
+  font: 600 8.5px Barlow, sans-serif;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  margin-bottom: 9px;
+}
+
+.tentatif-row {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 9px;
+}
+
+.tentatif-row .time {
+  width: 60px;
+  font: 600 12px Oswald, sans-serif;
+  color: var(--gold);
+}
+
+.tentatif-row .desc {
+  font: 500 12.5px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.info-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.info-actions a,
+.info-actions .btn-static {
+  flex: 1;
+  text-align: center;
+  padding: 11px 0;
+  border-radius: 11px;
+  font: 700 12px Barlow, sans-serif;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+.info-actions .primary {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.info-actions .secondary {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
