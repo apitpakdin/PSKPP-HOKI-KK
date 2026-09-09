@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { useAuth } from "../../state/AuthContext";
 import "./login.css";
 
@@ -15,7 +16,13 @@ export default function Login() {
     setError("");
     const { error: signInError } = await signIn(email, password);
     setBusy(false);
-    if (signInError) setError("Emel atau kata laluan salah.");
+    if (signInError) {
+      setError(
+        isAuthRetryableFetchError(signInError)
+          ? "Tidak dapat sambung ke pelayan. Sila semak sambungan internet dan cuba lagi."
+          : "Emel atau kata laluan salah.",
+      );
+    }
   };
 
   return (
