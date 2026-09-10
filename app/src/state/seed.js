@@ -37,7 +37,7 @@ function blankMatch({ id, day, phase, group, time, teamA, teamB }) {
 }
 
 // Round-robin order for 3 seeded teams: 1v2, 2v3, 1v3.
-const ROUND_ROBIN_PAIRS = [
+export const ROUND_ROBIN_PAIRS = [
   [0, 1],
   [1, 2],
   [0, 2],
@@ -136,5 +136,6 @@ export function initialState() {
     sunday: [],
     final: finalSeed(),
     tiebreaks: {},
+    shootouts: {},
   };
 }

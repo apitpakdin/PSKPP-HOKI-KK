@@ -1,6 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
 import { QUARTER_SECONDS, initialState, sundaySeed } from "./seed";
-import { buildXYDraw, finalTeams, saturdayComplete } from "./standings";
+import {
+  buildShootoutFixtures,
+  buildXYDraw,
+  finalTeams,
+  saturdayComplete,
+  shootoutStandings,
+} from "./standings";
 
 const STORAGE_KEY = "pskpp-hoki-2026";
 
@@ -94,14 +100,43 @@ function baseReducer(state, action) {
       if (state.sunday.some((m) => m.status !== "scheduled")) return state;
       return { ...state, xyDraw: null, sunday: [] };
     }
-    case "SET_TIEBREAK": {
-      const { group, order } = action;
-      return { ...state, tiebreaks: { ...state.tiebreaks, [group]: order } };
+    case "START_SHOOTOUT": {
+      const { group, teamIds } = action;
+      return {
+        ...state,
+        shootouts: { ...state.shootouts, [group]: buildShootoutFixtures(group, teamIds) },
+      };
     }
-    case "CLEAR_TIEBREAK": {
-      const next = { ...state.tiebreaks };
-      delete next[action.group];
-      return { ...state, tiebreaks: next };
+    case "ADJUST_SHOOTOUT_SCORE": {
+      const { group, id, side, delta } = action;
+      const key = side === "A" ? "scoreA" : "scoreB";
+      const fixtures = (state.shootouts[group] ?? []).map((m) =>
+        m.id === id ? { ...m, [key]: Math.max(0, m[key] + delta) } : m,
+      );
+      return { ...state, shootouts: { ...state.shootouts, [group]: fixtures } };
+    }
+    case "FINISH_SHOOTOUT_MATCH": {
+      const { group, id } = action;
+      const fixtures = (state.shootouts[group] ?? []).map((m) =>
+        m.id === id ? { ...m, status: "finished" } : m,
+      );
+      const next = { ...state, shootouts: { ...state.shootouts, [group]: fixtures } };
+      const allDone = fixtures.every((m) => m.status === "finished");
+      if (allDone) {
+        const rows = shootoutStandings(next, group);
+        if (rows.length && rows.every((r) => !r.needsShootout)) {
+          return { ...next, tiebreaks: { ...next.tiebreaks, [group]: rows.map((r) => r.id) } };
+        }
+      }
+      return next;
+    }
+    case "RESET_SHOOTOUT": {
+      const { group } = action;
+      const shootouts = { ...state.shootouts };
+      delete shootouts[group];
+      const tiebreaks = { ...state.tiebreaks };
+      delete tiebreaks[group];
+      return { ...state, shootouts, tiebreaks };
     }
     case "RESET": {
       return initialState();

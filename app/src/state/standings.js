@@ -7,7 +7,10 @@
 //   9.5 Gol terbanyak (most goals scored)
 //   9.6 Keputusan sesama sendiri (head-to-head result), for a two-way tie
 //   9.7 Shootout -- a real physical mini-competition when still tied,
-//       recorded manually via SET_TIEBREAK rather than guessed by the app.
+//       9.7.1 run as a round-robin (liga) when more than 2 teams are
+//       involved, following the same fixture order as the group stage
+//       (Peraturan 9.7.1); the secretariat keys in each shootout's score
+//       the same way as a normal match, rather than picking a final order.
 //
 // And the "Prosedur Undian Pasukan Peringkat XY" for the X/Y draw:
 //
@@ -15,6 +18,8 @@
 // 2. The naib johan (runner-up) from X1's group automatically goes to Y3.
 // 3. The naib johan from Y1's and Y2's groups go into group X; a draw
 //    decides which becomes X2 and which becomes X3.
+
+import { ROUND_ROBIN_PAIRS } from "./seed";
 
 function blankRow(id, name) {
   return { id, name, played: 0, won: 0, draw: 0, lost: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
@@ -181,4 +186,29 @@ export function finalTeams(state) {
     teamA: xyStandings(state, "X")[0]?.id ?? null,
     teamB: xyStandings(state, "Y")[0]?.id ?? null,
   };
+}
+
+// Peraturan 9.7.1: a shootout among more than 2 tied teams is run as a
+// round-robin, in the same fixture order as the group stage itself.
+export function buildShootoutFixtures(group, teamIds) {
+  const pairs = teamIds.length === 2 ? [[0, 1]] : ROUND_ROBIN_PAIRS;
+  return pairs.map(([x, y], i) => ({
+    id: `so-${group}-${i + 1}`,
+    teamA: teamIds[x],
+    teamB: teamIds[y],
+    scoreA: 0,
+    scoreB: 0,
+    status: "scheduled",
+  }));
+}
+
+// Re-applies Peraturan 9.2-9.6 to the shootout's own results to find the
+// final order -- the same cascade, just scored on the shootout instead of
+// the group stage.
+export function shootoutStandings(state, group) {
+  const fixtures = state.shootouts?.[group];
+  if (!fixtures || !fixtures.length) return [];
+  const teamIds = [...new Set(fixtures.flatMap((m) => [m.teamA, m.teamB]))];
+  const asMatches = fixtures.map((m) => ({ ...m, group }));
+  return computeStandings(asMatches, state.teams, teamIds, group);
 }
