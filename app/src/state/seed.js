@@ -36,11 +36,12 @@ function blankMatch({ id, day, phase, group, time, teamA, teamB }) {
   };
 }
 
-// Round-robin order for 3 seeded teams: 1v2, 2v3, 1v3.
+// Round-robin order for 3 seeded teams: 1v2, 3v1, 2v3. The first team in
+// each pair is the home team (listed first / plays first on the schedule).
 export const ROUND_ROBIN_PAIRS = [
   [0, 1],
+  [2, 0],
   [1, 2],
-  [0, 2],
 ];
 
 export function saturdaySeed() {
