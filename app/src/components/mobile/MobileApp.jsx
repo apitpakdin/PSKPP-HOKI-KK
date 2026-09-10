@@ -28,9 +28,11 @@ export default function MobileApp() {
           to="/dashboard"
           style={{
             position: "absolute",
-            right: 12,
-            top: 10,
+            right: 0,
+            top: 0,
             zIndex: 1,
+            display: "inline-block",
+            padding: "14px 16px",
             font: "600 9px Barlow, sans-serif",
             color: "rgba(255,255,255,.4)",
             textDecoration: "none",
