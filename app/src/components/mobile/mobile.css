@@ -585,3 +585,53 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
 }
+
+.sijil-note {
+  font: 600 12px Barlow, sans-serif;
+  color: #ffb4a8;
+}
+
+.sijil-field {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 10px 13px;
+}
+
+.sijil-field .label {
+  font: 600 8.5px Barlow, sans-serif;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.sijil-field select {
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font: 600 14px Barlow, sans-serif;
+}
+
+.sijil-field select:disabled {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.sijil-field select option {
+  color: #12291a;
+}
+
+.sijil-btn {
+  margin-top: 4px;
+  padding: 13px 0;
+  border: none;
+  border-radius: 11px;
+  background: var(--gold);
+  color: var(--ink);
+  font: 700 13px Barlow, sans-serif;
+  letter-spacing: 0.06em;
+}
+
+.sijil-btn:disabled {
+  opacity: 0.4;
+}

@@ -4,6 +4,7 @@ import { useTournamentState } from "../../state/TournamentContext";
 import JadualTab from "./JadualTab";
 import KedudukanTab from "./KedudukanTab";
 import KeputusanTab from "./KeputusanTab";
+import SijilTab from "./SijilTab";
 import InfoTab from "./InfoTab";
 import "./mobile.css";
 
@@ -11,6 +12,7 @@ const TABS = [
   { id: "jadual", label: "JADUAL", Comp: JadualTab },
   { id: "kedudukan", label: "KEDUDUKAN", Comp: KedudukanTab },
   { id: "keputusan", label: "KEPUTUSAN", Comp: KeputusanTab },
+  { id: "sijil", label: "SIJIL", Comp: SijilTab },
   { id: "info", label: "INFO", Comp: InfoTab },
 ];
 
