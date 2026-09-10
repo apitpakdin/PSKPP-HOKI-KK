@@ -94,6 +94,15 @@ function baseReducer(state, action) {
       if (state.sunday.some((m) => m.status !== "scheduled")) return state;
       return { ...state, xyDraw: null, sunday: [] };
     }
+    case "SET_TIEBREAK": {
+      const { group, order } = action;
+      return { ...state, tiebreaks: { ...state.tiebreaks, [group]: order } };
+    }
+    case "CLEAR_TIEBREAK": {
+      const next = { ...state.tiebreaks };
+      delete next[action.group];
+      return { ...state, tiebreaks: next };
+    }
     case "RESET": {
       return initialState();
     }

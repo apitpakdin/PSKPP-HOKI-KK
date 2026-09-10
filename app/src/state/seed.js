@@ -135,5 +135,6 @@ export function initialState() {
     xyDraw: null,
     sunday: [],
     final: finalSeed(),
+    tiebreaks: {},
   };
 }
