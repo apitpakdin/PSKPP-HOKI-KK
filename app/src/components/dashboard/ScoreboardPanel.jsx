@@ -49,40 +49,37 @@ export default function ScoreboardPanel({ state, selectedId, onSelect, match, li
       <div className="score-main">
         <div className="score-team">
           <div className="name">{teamName(state.teams, match.teamA)}</div>
-        </div>
-        <div className="score-controls">
-          <button
-            className="score-btn"
-            disabled={!canScore || match.scoreA === 0}
-            onClick={() => adjust("A", -1)}
-          >
-            −
-          </button>
-          <div className="score-num">
-            {match.scoreA}
-            <span className="dash">–</span>
-            {match.scoreB}
+          <div className="score-controls">
+            <button
+              className="score-btn"
+              disabled={!canScore || match.scoreA === 0}
+              onClick={() => adjust("A", -1)}
+            >
+              −
+            </button>
+            <div className="score-num">{match.scoreA}</div>
+            <button className="score-btn plus" disabled={!canScore} onClick={() => adjust("A", 1)}>
+              +
+            </button>
           </div>
-          <button className="score-btn plus" disabled={!canScore} onClick={() => adjust("A", 1)}>
-            +
-          </button>
         </div>
+        <div className="score-vs">–</div>
         <div className="score-team right">
           <div className="name">{teamName(state.teams, match.teamB)}</div>
+          <div className="score-controls">
+            <button
+              className="score-btn"
+              disabled={!canScore || match.scoreB === 0}
+              onClick={() => adjust("B", -1)}
+            >
+              −
+            </button>
+            <div className="score-num">{match.scoreB}</div>
+            <button className="score-btn plus" disabled={!canScore} onClick={() => adjust("B", 1)}>
+              +
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 10 }}>
-        <button
-          className="score-btn"
-          disabled={!canScore || match.scoreB === 0}
-          onClick={() => adjust("B", -1)}
-        >
-          −
-        </button>
-        <button className="score-btn plus" disabled={!canScore} onClick={() => adjust("B", 1)}>
-          +
-        </button>
       </div>
 
       <div className="score-foot">
