@@ -12,8 +12,8 @@ export async function fetchReferees() {
   return data;
 }
 
-export async function replacePlayers(rows) {
-  const { error: delErr } = await supabase.from("players").delete().not("id", "is", null);
+export async function replaceTeamPlayers(teamId, rows) {
+  const { error: delErr } = await supabase.from("players").delete().eq("team_id", teamId);
   if (delErr) throw delErr;
   if (rows.length) {
     const { error } = await supabase.from("players").insert(rows);
