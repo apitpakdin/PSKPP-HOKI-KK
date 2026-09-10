@@ -33,6 +33,7 @@ function blankMatch({ id, day, phase, group, time, teamA, teamB }) {
     quarter: 1,
     clockSeconds: QUARTER_SECONDS,
     running: false,
+    refereeId: null,
   };
 }
 

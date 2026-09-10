@@ -51,6 +51,12 @@ function baseReducer(state, action) {
       if (list === "final") return { ...state, final: apply(state.final) };
       return { ...state, [list]: updateMatchInList(state[list], id, apply) };
     }
+    case "SET_MATCH_REFEREE": {
+      const { list, id, refereeId } = action;
+      const apply = (m) => ({ ...m, refereeId });
+      if (list === "final") return { ...state, final: apply(state.final) };
+      return { ...state, [list]: updateMatchInList(state[list], id, apply) };
+    }
     case "START_MATCH": {
       const { list, id } = action;
       const apply = (m) => ({ ...m, status: "live", running: true });

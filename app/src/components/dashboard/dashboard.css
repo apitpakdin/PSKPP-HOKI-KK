@@ -692,8 +692,26 @@
   min-width: 0;
 }
 
+.schedule-referee {
+  flex: none;
+  width: 150px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(18, 41, 26, 0.2);
+  background: #fff;
+  font: 500 11.5px Barlow, sans-serif;
+  color: var(--ink);
+}
+
+.schedule-referee:disabled {
+  opacity: 0.5;
+}
+
 .schedule-status {
   flex: none;
+  width: 78px;
+  text-align: right;
+  white-space: nowrap;
   font-weight: 700;
   color: rgba(18, 41, 26, 0.5);
 }
