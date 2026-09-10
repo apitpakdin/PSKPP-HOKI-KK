@@ -2,6 +2,11 @@ const MAPS_QUERY = encodeURIComponent(
   "Turf Hoki Universiti Sultan Azlan Shah, Kuala Kangsar, Perak",
 );
 
+const CONTACTS = [
+  { name: "Mior Syafiq (PT)", phoneDisplay: "013-505 3236", wa: "60135053236" },
+  { name: "Hafiz (Pen. PT)", phoneDisplay: "013-506 2845", wa: "60135062845" },
+];
+
 export default function InfoTab() {
   return (
     <>
@@ -67,6 +72,25 @@ export default function InfoTab() {
             <span className="desc">Makan malam di SMK Tun Perak</span>
           </div>
         </div>
+        <div className="tentatif-card">
+          <div className="tentatif-title">HUBUNGI URUSETIA</div>
+          {CONTACTS.map((c) => (
+            <div className="contact-row" key={c.wa}>
+              <div>
+                <div className="contact-name">{c.name}</div>
+                <div className="contact-phone">{c.phoneDisplay}</div>
+              </div>
+              <a
+                className="contact-wa"
+                href={`https://wa.me/${c.wa}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                WhatsApp
+              </a>
+            </div>
+          ))}
+        </div>
         <div className="info-actions">
           <a
             className="primary"
@@ -76,7 +100,9 @@ export default function InfoTab() {
           >
             ARAH KE TURF
           </a>
-          <span className="btn-static secondary">HUBUNGI URUSETIA</span>
+          <a className="secondary" href={`https://wa.me/${CONTACTS[0].wa}`} target="_blank" rel="noreferrer">
+            HUBUNGI URUSETIA
+          </a>
         </div>
       </div>
     </>

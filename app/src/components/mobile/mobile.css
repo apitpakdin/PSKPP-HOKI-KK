@@ -565,8 +565,7 @@
   gap: 8px;
 }
 
-.info-actions a,
-.info-actions .btn-static {
+.info-actions a {
   flex: 1;
   text-align: center;
   padding: 11px 0;
@@ -584,6 +583,39 @@
 .info-actions .secondary {
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.contact-row:last-child {
+  padding-bottom: 0;
+}
+
+.contact-name {
+  font: 600 13px Barlow, sans-serif;
+  color: #fff;
+}
+
+.contact-phone {
+  font: 500 11.5px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 2px;
+}
+
+.contact-wa {
+  flex: none;
+  padding: 7px 14px;
+  border-radius: 9px;
+  background: #25d366;
+  color: #063d21;
+  font: 700 11px Barlow, sans-serif;
+  text-decoration: none;
 }
 
 .sijil-note {
