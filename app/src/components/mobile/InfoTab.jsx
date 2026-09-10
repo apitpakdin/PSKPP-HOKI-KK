@@ -100,9 +100,6 @@ export default function InfoTab() {
           >
             ARAH KE TURF
           </a>
-          <a className="secondary" href={`https://wa.me/${CONTACTS[0].wa}`} target="_blank" rel="noreferrer">
-            HUBUNGI URUSETIA
-          </a>
         </div>
       </div>
     </>
