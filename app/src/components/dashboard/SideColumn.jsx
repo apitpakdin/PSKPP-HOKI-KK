@@ -10,7 +10,7 @@ export default function SideColumn({ state }) {
   const next = nextMatch(state);
   const allSat = state.saturday;
   const doneSat = allSat.filter((m) => m.status === "finished").length;
-  const allMatches = [...state.saturday, ...state.sunday, state.final].filter(
+  const allMatches = [...state.saturday, ...state.sunday, state.thirdPlace, state.final].filter(
     (m) => m.teamA && m.teamB,
   );
   const goals = allMatches.reduce((sum, m) => sum + m.scoreA + m.scoreB, 0);
@@ -27,7 +27,11 @@ export default function SideColumn({ state }) {
               {teamName(state.teams, next.teamA)} vs {teamName(state.teams, next.teamB)}
             </div>
             <div className="detail">
-              {next.phase === "final" ? "Perlawanan Akhir" : `Kumpulan ${next.group}`}
+              {next.phase === "final"
+                ? "Perlawanan Akhir"
+                : next.phase === "third"
+                  ? "Tempat Ke-3/4"
+                  : `Kumpulan ${next.group}`}
             </div>
           </>
         ) : (

@@ -42,7 +42,12 @@ export default function ScoreboardPanel({ state, selectedId, onSelect, match, li
             : match.status === "finished"
               ? "TAMAT"
               : "BELUM MULA"}{" "}
-          · {match.phase === "final" ? "PERLAWANAN AKHIR" : `KUMPULAN ${match.group}`}
+          ·{" "}
+          {match.phase === "final"
+            ? "PERLAWANAN AKHIR"
+            : match.phase === "third"
+              ? "TEMPAT KE-3/4"
+              : `KUMPULAN ${match.group}`}
         </span>
       </div>
 

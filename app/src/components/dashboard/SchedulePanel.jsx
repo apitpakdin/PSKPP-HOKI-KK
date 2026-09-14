@@ -7,7 +7,9 @@ import { useTournamentDispatch } from "../../state/TournamentContext";
 const DAY_LABEL = { sat: "SABTU 19 SEPTEMBER", sun: "AHAD 20 SEPTEMBER" };
 
 function rowGroup(m) {
-  return m.phase === "final" ? "Akhir" : `Kump ${m.group}`;
+  if (m.phase === "final") return "Akhir";
+  if (m.phase === "third") return "Tempat 3/4";
+  return `Kump ${m.group}`;
 }
 
 export default function SchedulePanel({ state }) {

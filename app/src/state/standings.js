@@ -19,7 +19,7 @@
 // 3. The naib johan from Y1's and Y2's groups go into group X; a draw
 //    decides which becomes X2 and which becomes X3.
 
-import { ROUND_ROBIN_PAIRS } from "./seed";
+import { GROUP_ROUND_ROBIN_PAIRS } from "./seed";
 
 function blankRow(id, name) {
   return { id, name, played: 0, won: 0, draw: 0, lost: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
@@ -188,10 +188,21 @@ export function finalTeams(state) {
   };
 }
 
+// Tempat ke-3/4: Naib Johan X vs Naib Johan Y.
+export function thirdPlaceTeams(state) {
+  if (!state.xyDraw || !xyComplete(state, "X") || !xyComplete(state, "Y")) {
+    return { teamA: null, teamB: null };
+  }
+  return {
+    teamA: xyStandings(state, "X")[1]?.id ?? null,
+    teamB: xyStandings(state, "Y")[1]?.id ?? null,
+  };
+}
+
 // Peraturan 9.7.1: a shootout among more than 2 tied teams is run as a
 // round-robin, in the same fixture order as the group stage itself.
 export function buildShootoutFixtures(group, teamIds) {
-  const pairs = teamIds.length === 2 ? [[0, 1]] : ROUND_ROBIN_PAIRS;
+  const pairs = teamIds.length === 2 ? [[0, 1]] : GROUP_ROUND_ROBIN_PAIRS;
   return pairs.map(([x, y], i) => ({
     id: `so-${group}-${i + 1}`,
     teamA: teamIds[x],

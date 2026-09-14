@@ -6,6 +6,7 @@ import {
   finalTeams,
   saturdayComplete,
   shootoutStandings,
+  thirdPlaceTeams,
 } from "./standings";
 
 const STORAGE_KEY = "pskpp-hoki-2026";
@@ -19,7 +20,10 @@ function loadState() {
     if (!raw) return initialState();
     const parsed = JSON.parse(raw);
     if (!parsed || !parsed.saturday || !parsed.final) return initialState();
-    return parsed;
+    // Spread over a fresh initialState() so a save from before a field (e.g.
+    // thirdPlace, tiebreaks, shootouts) existed still loads instead of
+    // wiping all progress.
+    return { ...initialState(), ...parsed };
   } catch {
     return initialState();
   }
@@ -30,16 +34,27 @@ function updateMatchInList(list, id, updater) {
 }
 
 // Once both X and Y round robins finish, lock the champions into the final
-// match so it becomes selectable/startable on the scoreboard.
-function syncFinalTeams(state) {
-  if (state.final.status !== "scheduled") return state;
-  const { teamA, teamB } = finalTeams(state);
-  if (teamA === state.final.teamA && teamB === state.final.teamB) return state;
-  return { ...state, final: { ...state.final, teamA, teamB } };
+// and tempat ke-3/4 matches so they become selectable/startable on the
+// scoreboard.
+function syncDerivedTeams(state) {
+  let next = state;
+  if (next.final.status === "scheduled") {
+    const { teamA, teamB } = finalTeams(next);
+    if (teamA !== next.final.teamA || teamB !== next.final.teamB) {
+      next = { ...next, final: { ...next.final, teamA, teamB } };
+    }
+  }
+  if (next.thirdPlace.status === "scheduled") {
+    const { teamA, teamB } = thirdPlaceTeams(next);
+    if (teamA !== next.thirdPlace.teamA || teamB !== next.thirdPlace.teamB) {
+      next = { ...next, thirdPlace: { ...next.thirdPlace, teamA, teamB } };
+    }
+  }
+  return next;
 }
 
 function reducer(state, action) {
-  return syncFinalTeams(baseReducer(state, action));
+  return syncDerivedTeams(baseReducer(state, action));
 }
 
 function baseReducer(state, action) {
@@ -48,25 +63,25 @@ function baseReducer(state, action) {
       const { list, id, side, delta } = action;
       const key = side === "A" ? "scoreA" : "scoreB";
       const apply = (m) => ({ ...m, [key]: Math.max(0, m[key] + delta) });
-      if (list === "final") return { ...state, final: apply(state.final) };
+      if (list === "final" || list === "thirdPlace") return { ...state, [list]: apply(state[list]) };
       return { ...state, [list]: updateMatchInList(state[list], id, apply) };
     }
     case "SET_MATCH_REFEREE": {
       const { list, id, refereeId } = action;
       const apply = (m) => ({ ...m, refereeId });
-      if (list === "final") return { ...state, final: apply(state.final) };
+      if (list === "final" || list === "thirdPlace") return { ...state, [list]: apply(state[list]) };
       return { ...state, [list]: updateMatchInList(state[list], id, apply) };
     }
     case "START_MATCH": {
       const { list, id } = action;
       const apply = (m) => ({ ...m, status: "live", running: true });
-      if (list === "final") return { ...state, final: apply(state.final) };
+      if (list === "final" || list === "thirdPlace") return { ...state, [list]: apply(state[list]) };
       return { ...state, [list]: updateMatchInList(state[list], id, apply) };
     }
     case "TOGGLE_CLOCK": {
       const { list, id } = action;
       const apply = (m) => ({ ...m, running: !m.running });
-      if (list === "final") return { ...state, final: apply(state.final) };
+      if (list === "final" || list === "thirdPlace") return { ...state, [list]: apply(state[list]) };
       return { ...state, [list]: updateMatchInList(state[list], id, apply) };
     }
     case "END_QUARTER": {
@@ -77,13 +92,13 @@ function baseReducer(state, action) {
         }
         return { ...m, quarter: m.quarter + 1, clockSeconds: QUARTER_SECONDS, running: false };
       };
-      if (list === "final") return { ...state, final: apply(state.final) };
+      if (list === "final" || list === "thirdPlace") return { ...state, [list]: apply(state[list]) };
       return { ...state, [list]: updateMatchInList(state[list], id, apply) };
     }
     case "FINISH_MATCH": {
       const { list, id } = action;
       const apply = (m) => ({ ...m, status: "finished", running: false });
-      if (list === "final") return { ...state, final: apply(state.final) };
+      if (list === "final" || list === "thirdPlace") return { ...state, [list]: apply(state[list]) };
       return { ...state, [list]: updateMatchInList(state[list], id, apply) };
     }
     case "TICK": {
@@ -93,6 +108,7 @@ function baseReducer(state, action) {
         ...state,
         saturday: state.saturday.map(tick),
         sunday: state.sunday.map(tick),
+        thirdPlace: tick(state.thirdPlace),
         final: tick(state.final),
       };
     }
@@ -153,7 +169,7 @@ function baseReducer(state, action) {
 }
 
 export function TournamentProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, undefined, () => syncFinalTeams(loadState()));
+  const [state, dispatch] = useReducer(reducer, undefined, () => syncDerivedTeams(loadState()));
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -187,7 +203,9 @@ export function useTournamentDispatch() {
 
 export function useCurrentLive(state) {
   return useMemo(() => {
-    const all = [...state.saturday, ...state.sunday, state.final].filter(Boolean);
+    const all = [...state.saturday, ...state.sunday, state.thirdPlace, state.final].filter(
+      Boolean,
+    );
     return all.find((m) => m.status === "live") ?? null;
   }, [state]);
 }

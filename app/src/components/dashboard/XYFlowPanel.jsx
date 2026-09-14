@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { teamName } from "../../lib/format";
-import { finalTeams, groupStandings, saturdayComplete } from "../../state/standings";
+import { finalTeams, groupStandings, saturdayComplete, thirdPlaceTeams } from "../../state/standings";
 import { useTournamentDispatch } from "../../state/TournamentContext";
 
 const GROUPS = ["A", "B", "C"];
@@ -112,6 +112,8 @@ export default function XYFlowPanel({ state }) {
 
   const { teamA, teamB } = finalTeams(state);
   const final = state.final;
+  const third = state.thirdPlace;
+  const thirdIds = thirdPlaceTeams(state);
 
   return (
     <div className="panel" style={{ width: 430, flex: "none" }}>
@@ -140,7 +142,7 @@ export default function XYFlowPanel({ state }) {
         </div>
         <div className="xy-arrow">→</div>
         <div className="xy-final">
-          <div className="tag">PERLAWANAN AKHIR</div>
+          <div className="tag">PERLAWANAN AKHIR · 2:20 PTG</div>
           {final.status === "finished" ? (
             <>
               <div className="team">
@@ -158,7 +160,20 @@ export default function XYFlowPanel({ state }) {
               <div className="team">{teamB ? teamName(state.teams, teamB) : "Johan Kumpulan Y"}</div>
             </>
           )}
-          <div className="foot">12:30 tgh · penyampaian medal 1:00</div>
+          <div className="foot">
+            Tempat ke-3/4 (1:45 ptg):{" "}
+            {third.status === "finished" ? (
+              <>
+                {teamName(state.teams, third.teamA)} {third.scoreA} – {third.scoreB}{" "}
+                {teamName(state.teams, third.teamB)}
+              </>
+            ) : (
+              <>
+                {thirdIds.teamA ? teamName(state.teams, thirdIds.teamA) : "Naib Johan X"} vs{" "}
+                {thirdIds.teamB ? teamName(state.teams, thirdIds.teamB) : "Naib Johan Y"}
+              </>
+            )}
+          </div>
         </div>
       </div>
       {canClearDraw && (

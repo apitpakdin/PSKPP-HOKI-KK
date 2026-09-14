@@ -1,6 +1,7 @@
-// Seed data for Kejohanan Jemputan PSKPP Hoki Guru Perak 2026.
-// Groups and teams from the tournament poster; Saturday fixtures follow the
-// 8:00am-3:30pm, 45-minute-slot round robin (3 matches per group).
+// Seed data for Kejohanan Jemputan PSKPP Hoki Guru Perak 2026, matching the
+// official "Jadual Perlawanan Jemputan Hoki PSKPP Guru Negeri Perak 2026"
+// (Sabtu 19 Sept: group stage; Ahad 20 Sept: Peringkat XY, tempat ke-3/4,
+// and final).
 
 export const QUARTER_SECONDS = 15 * 60; // 15:5:15 quarters
 
@@ -37,9 +38,15 @@ function blankMatch({ id, day, phase, group, time, teamA, teamB }) {
   };
 }
 
-// Round-robin order for 3 seeded teams: 1v2, 3v1, 2v3. The first team in
-// each pair is the home team (listed first / plays first on the schedule).
-export const ROUND_ROBIN_PAIRS = [
+// Sabtu group-stage order per the official jadual: 1v2, 2v3, 3v1.
+export const GROUP_ROUND_ROBIN_PAIRS = [
+  [0, 1],
+  [1, 2],
+  [2, 0],
+];
+
+// Ahad Peringkat XY order per the official jadual: 1v2, 3v1, 2v3.
+export const XY_ROUND_ROBIN_PAIRS = [
   [0, 1],
   [2, 0],
   [1, 2],
@@ -53,12 +60,12 @@ export function saturdaySeed() {
     C: ["C1", "C2", "C3"],
   };
   const times = [
-    "8:00 pg",
-    "8:45 pg",
-    "9:30 pg",
-    "10:15 pg",
-    "11:00 pg",
-    "11:45 pg",
+    "8:30 pg",
+    "9:10 pg",
+    "9:50 pg",
+    "10:30 pg",
+    "11:10 pg",
+    "11:50 pg",
     "2:00 ptg",
     "2:45 ptg",
     "3:30 ptg",
@@ -67,7 +74,7 @@ export function saturdaySeed() {
   for (let round = 0; round < 3; round++) {
     groupOrder.forEach((group, gi) => {
       const seeds = groupSeeds[group];
-      const [x, y] = ROUND_ROBIN_PAIRS[round];
+      const [x, y] = GROUP_ROUND_ROBIN_PAIRS[round];
       const time = times[round * 3 + gi];
       matches.push(
         blankMatch({
@@ -85,13 +92,13 @@ export function saturdaySeed() {
   return matches;
 }
 
-const SUNDAY_TIMES = ["7:30 pg", "8:15 pg", "9:00 pg", "9:45 pg", "10:30 pg", "11:15 pg"];
+const SUNDAY_TIMES = ["8:30 pg", "9:10 pg", "9:50 pg", "10:30 pg", "11:10 pg", "11:50 pg"];
 
 // draw: { X: [id,id,id], Y: [id,id,id] } seeded 1/2/3 per side
 export function sundaySeed(draw) {
   const matches = [];
   for (let round = 0; round < 3; round++) {
-    const [x, y] = ROUND_ROBIN_PAIRS[round];
+    const [x, y] = XY_ROUND_ROBIN_PAIRS[round];
     matches.push(
       blankMatch({
         id: `sun-X-${round + 1}`,
@@ -118,13 +125,26 @@ export function sundaySeed(draw) {
   return matches;
 }
 
+// Naib Johan X vs Naib Johan Y, 1:45 ptg -- before the final at 2:20 ptg.
+export function thirdPlaceSeed() {
+  return blankMatch({
+    id: "third",
+    day: "sun",
+    phase: "third",
+    group: null,
+    time: "1:45 ptg",
+    teamA: null,
+    teamB: null,
+  });
+}
+
 export function finalSeed() {
   return blankMatch({
     id: "final",
     day: "sun",
     phase: "final",
     group: null,
-    time: "12:30 tgh",
+    time: "2:20 ptg",
     teamA: null,
     teamB: null,
   });
@@ -136,6 +156,7 @@ export function initialState() {
     saturday: saturdaySeed(),
     xyDraw: null,
     sunday: [],
+    thirdPlace: thirdPlaceSeed(),
     final: finalSeed(),
     tiebreaks: {},
     shootouts: {},

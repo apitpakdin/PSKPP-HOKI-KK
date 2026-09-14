@@ -6,7 +6,12 @@ function MatchRow({ state, m }) {
   const [time, ampm] = m.time.split(" ");
   const isLive = m.status === "live";
   const isFinished = m.status === "finished";
-  const groupLabel = m.phase === "final" ? "PERLAWANAN AKHIR" : `KUMPULAN ${m.group ?? ""}`;
+  const groupLabel =
+    m.phase === "final"
+      ? "PERLAWANAN AKHIR"
+      : m.phase === "third"
+        ? "TEMPAT KE-3/4"
+        : `KUMPULAN ${m.group ?? ""}`;
 
   return (
     <div className={`match-row ${m.status}`}>
@@ -46,7 +51,7 @@ function MatchRow({ state, m }) {
 
 export default function JadualTab({ state }) {
   const [day, setDay] = useState("sat");
-  const list = day === "sat" ? state.saturday : [...state.sunday, state.final];
+  const list = day === "sat" ? state.saturday : [...state.sunday, state.thirdPlace, state.final];
 
   return (
     <>

@@ -4,6 +4,7 @@ export function allMatchesWithList(state) {
   return [
     ...state.saturday.map((m) => ({ m, list: "saturday" })),
     ...state.sunday.map((m) => ({ m, list: "sunday" })),
+    { m: state.thirdPlace, list: "thirdPlace" },
     { m: state.final, list: "final" },
   ];
 }
@@ -13,7 +14,8 @@ export function findMatch(state, id) {
 }
 
 export function matchLabel(state, m) {
-  const group = m.phase === "final" ? "Akhir" : `Kump ${m.group}`;
+  const group =
+    m.phase === "final" ? "Akhir" : m.phase === "third" ? "Tempat Ke-3/4" : `Kump ${m.group}`;
   const a = m.teamA ? teamName(state.teams, m.teamA) : "?";
   const b = m.teamB ? teamName(state.teams, m.teamB) : "?";
   return `${m.time} · ${group} · ${a} vs ${b}`;

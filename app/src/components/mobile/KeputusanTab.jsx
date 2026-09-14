@@ -2,14 +2,18 @@ import { useState } from "react";
 import { useCurrentLive } from "../../state/TournamentContext";
 import { teamName } from "../../lib/format";
 
+function phaseLabel(m) {
+  if (m.phase === "final") return "PERLAWANAN AKHIR";
+  if (m.phase === "third") return "TEMPAT KE-3/4";
+  return `KUMPULAN ${m.group}`;
+}
+
 function LiveHero({ state, m }) {
   return (
     <div className="live-hero">
       <div className="live-hero-tag">
         <span className="dot" />
-        <span>
-          LANGSUNG · {m.phase === "final" ? "PERLAWANAN AKHIR" : `KUMPULAN ${m.group}`}
-        </span>
+        <span>LANGSUNG · {phaseLabel(m)}</span>
       </div>
       <div className="live-hero-score">
         <div className="live-hero-team">
@@ -39,7 +43,7 @@ function LiveHero({ state, m }) {
 export default function KeputusanTab({ state }) {
   const [day, setDay] = useState("sat");
   const live = useCurrentLive(state);
-  const list = day === "sat" ? state.saturday : [...state.sunday, state.final];
+  const list = day === "sat" ? state.saturday : [...state.sunday, state.thirdPlace, state.final];
   const finished = list.filter((m) => m.status === "finished");
 
   return (
@@ -67,7 +71,7 @@ export default function KeputusanTab({ state }) {
           <div key={m.id} className="finished-row">
             <div style={{ flex: 1 }}>
               <div className="meta">
-                {m.phase === "final" ? "PERLAWANAN AKHIR" : `KUMPULAN ${m.group}`} · {m.time}
+                {phaseLabel(m)} · {m.time}
               </div>
               <div className={`line ${m.scoreA >= m.scoreB ? "winner" : ""}`}>
                 <span>{teamName(state.teams, m.teamA)}</span>
