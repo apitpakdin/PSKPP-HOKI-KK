@@ -122,22 +122,36 @@ export default function StandingsPanel({ state }) {
   return (
     <div className="panel">
       <div className="panel-head">KEDUDUKAN KUMPULAN</div>
-      <div className="standings-cols">
-        {GROUPS.map((g) => (
-          <div className="standings-col" key={g}>
-            <div className="g">{g}</div>
-            {standingsByGroup[g].map((r, i) => (
-              <div key={r.id} className={`row ${i === 2 ? "low" : ""}`}>
-                <span>
-                  {r.name}
-                  {r.needsShootout ? " ⚠" : ""}
-                </span>
-                <span>{r.pts}</span>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
+      {GROUPS.map((g) => (
+        <div className="stand-group" key={g}>
+          <div className="stand-group-title">KUMPULAN {g}</div>
+          <table className="stand-table">
+            <thead>
+              <tr>
+                <th className="stand-name">Pasukan</th>
+                <th>Menang</th>
+                <th>Beza Gol</th>
+                <th>Gol</th>
+                <th>Mata</th>
+              </tr>
+            </thead>
+            <tbody>
+              {standingsByGroup[g].map((r, i) => (
+                <tr key={r.id} className={i === 2 ? "low" : ""}>
+                  <td className="stand-name">
+                    {r.name}
+                    {r.needsShootout ? " ⚠" : ""}
+                  </td>
+                  <td>{r.won}</td>
+                  <td>{r.gd}</td>
+                  <td>{r.gf}</td>
+                  <td className="stand-pts">{r.pts}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
       {GROUPS.map((g) => {
         const tied = standingsByGroup[g].filter((r) => r.needsShootout);
         if (!tied.length) return null;
