@@ -9,7 +9,7 @@ export const teams = {
   A1: { id: "A1", name: "Kinta Utara", group: "A" },
   A2: { id: "A2", name: "Kerian", group: "A" },
   A3: { id: "A3", name: "Manjung", group: "A" },
-  B1: { id: "B1", name: "Batang PDG", group: "B" },
+  B1: { id: "B1", name: "Batang Padang", group: "B" },
   B2: { id: "B2", name: "Kuala Kangsar", group: "B" },
   B3: { id: "B3", name: "Perak Tengah", group: "B" },
   C1: { id: "C1", name: "Hulu Perak", group: "C" },
