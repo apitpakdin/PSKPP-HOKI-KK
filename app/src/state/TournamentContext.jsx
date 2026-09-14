@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
-import { QUARTER_SECONDS, initialState, sundaySeed } from "./seed";
+import { QUARTER_SECONDS, initialState, sundaySeed, teams } from "./seed";
 import {
   buildShootoutFixtures,
   buildXYDraw,
@@ -22,8 +22,11 @@ function loadState() {
     if (!parsed || !parsed.saturday || !parsed.final) return initialState();
     // Spread over a fresh initialState() so a save from before a field (e.g.
     // thirdPlace, tiebreaks, shootouts) existed still loads instead of
-    // wiping all progress.
-    return { ...initialState(), ...parsed };
+    // wiping all progress. `teams` is always forced fresh from seed.js --
+    // it's a fixed reference table no reducer action ever mutates, so an
+    // old save's copy (e.g. a team name from before a rename) must never
+    // win over the current source of truth.
+    return { ...initialState(), ...parsed, teams };
   } catch {
     return initialState();
   }
