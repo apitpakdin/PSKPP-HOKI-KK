@@ -153,6 +153,11 @@
   cursor: not-allowed;
 }
 
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 11px;
+}
+
 .dash-row {
   display: flex;
   gap: 14px;
@@ -788,6 +793,11 @@
   padding: 8px 14px;
   font: 600 12px Barlow, sans-serif;
   color: var(--gold-2);
+  border-bottom: 1px solid rgba(18, 41, 26, 0.08);
+}
+
+.schedule-toolbar {
+  padding: 10px 14px;
   border-bottom: 1px solid rgba(18, 41, 26, 0.08);
 }
 

@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { teamName } from "../../lib/format";
 import { allMatchesWithList } from "../../lib/matches";
-import { fetchReferees } from "../../lib/roster";
+import {
+  downloadWorkbook,
+  generateAllMatchFormsWorkbook,
+  generateMatchFormWorkbook,
+  matchFormFilename,
+} from "../../lib/matchForm";
+import { fetchPlayers, fetchReferees } from "../../lib/roster";
 import { useTournamentDispatch } from "../../state/TournamentContext";
 
 const DAY_LABEL = { sat: "SABTU 19 SEPTEMBER", sun: "AHAD 20 SEPTEMBER" };
@@ -16,13 +22,38 @@ export default function SchedulePanel({ state }) {
   const dispatch = useTournamentDispatch();
   const [referees, setReferees] = useState([]);
   const [loadError, setLoadError] = useState(false);
+  const [players, setPlayers] = useState([]);
+  const [formBusy, setFormBusy] = useState(null);
   const all = allMatchesWithList(state);
 
   useEffect(() => {
     fetchReferees()
       .then(setReferees)
       .catch(() => setLoadError(true));
+    fetchPlayers()
+      .then(setPlayers)
+      .catch(() => {});
   }, []);
+
+  const handlePrintOne = async (m) => {
+    setFormBusy(m.id);
+    try {
+      const wb = await generateMatchFormWorkbook(state, m, players);
+      await downloadWorkbook(wb, matchFormFilename(state, m));
+    } finally {
+      setFormBusy(null);
+    }
+  };
+
+  const handlePrintAll = async () => {
+    setFormBusy("all");
+    try {
+      const wb = await generateAllMatchFormsWorkbook(state, players);
+      await downloadWorkbook(wb, "Borang Perlawanan - Semua Perlawanan.xlsx");
+    } finally {
+      setFormBusy(null);
+    }
+  };
 
   return (
     <div className="panel" style={{ flex: "none", width: "100%" }}>
@@ -34,6 +65,11 @@ export default function SchedulePanel({ state }) {
             : "Belum ada pengadil didaftarkan — daftar di tab Pengadil untuk boleh tetapkan pengadil perlawanan."}
         </div>
       )}
+      <div className="schedule-toolbar">
+        <button className="btn" disabled={formBusy === "all"} onClick={handlePrintAll}>
+          {formBusy === "all" ? "Menjana…" : "Muat Turun Semua Borang Perlawanan"}
+        </button>
+      </div>
       <div className="schedule-body">
         {["sat", "sun"].map((day) => {
           const dayMatches = all.filter(({ m }) => m.day === day);
@@ -75,6 +111,13 @@ export default function SchedulePanel({ state }) {
                         ? "LIVE"
                         : "BELUM MULA"}
                   </span>
+                  <button
+                    className="btn btn-sm"
+                    disabled={!m.teamA || !m.teamB || formBusy === m.id}
+                    onClick={() => handlePrintOne(m)}
+                  >
+                    {formBusy === m.id ? "Menjana…" : "Borang"}
+                  </button>
                 </div>
               ))}
             </div>
