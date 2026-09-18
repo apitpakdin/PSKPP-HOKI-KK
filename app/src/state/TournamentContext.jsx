@@ -171,13 +171,20 @@ function baseReducer(state, action) {
     case "TICK": {
       const tick = (m) =>
         m.running && m.clockSeconds > 0 ? { ...m, clockSeconds: m.clockSeconds - 1 } : m;
-      return {
-        ...state,
-        saturday: state.saturday.map(tick),
-        sunday: state.sunday.map(tick),
-        thirdPlace: tick(state.thirdPlace),
-        final: tick(state.final),
-      };
+      const saturday = state.saturday.map(tick);
+      const sunday = state.sunday.map(tick);
+      const thirdPlace = tick(state.thirdPlace);
+      const final = tick(state.final);
+      const changed =
+        saturday.some((m, i) => m !== state.saturday[i]) ||
+        sunday.some((m, i) => m !== state.sunday[i]) ||
+        thirdPlace !== state.thirdPlace ||
+        final !== state.final;
+      // Nothing running on this device's view: bail out to the SAME state
+      // reference so an idle tab doesn't re-push a stale copy every second
+      // and race with (and silently overwrite) a genuinely fresher change.
+      if (!changed) return state;
+      return { ...state, saturday, sunday, thirdPlace, final };
     }
     case "RUN_DRAW": {
       if (!saturdayComplete(state) || state.xyDraw) return state;
