@@ -6,21 +6,38 @@ function StandingsTable({ label, rows, gold }) {
     <div className="standings-group">
       <div className={`standings-head ${gold ? "gold" : ""}`}>
         <span>KUMPULAN {label}</span>
-        <span>M · MG · K · BG · MT</span>
       </div>
-      {rows.map((r, i) => (
-        <div key={r.id} className={`standings-row ${i < 2 ? "qualified" : ""}`}>
-          <span className="standings-rank">{i + 1}</span>
-          <span className="standings-name">
-            {r.name}
-            {r.needsShootout ? " ⚠" : ""}
-          </span>
-          <span className="standings-meta">
-            {r.played} · {r.won} · {r.lost} · {r.gd >= 0 ? `+${r.gd}` : r.gd}
-          </span>
-          <span className="standings-pts">{r.pts}</span>
-        </div>
-      ))}
+      <table className="standings-table">
+        <thead>
+          <tr>
+            <th className="st-name">Pasukan</th>
+            <th>M</th>
+            <th>MG</th>
+            <th>S</th>
+            <th>K</th>
+            <th>BG</th>
+            <th>G</th>
+            <th>MT</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={r.id} className={i < 2 ? "qualified" : ""}>
+              <td className="st-name">
+                {r.name}
+                {r.needsShootout ? " ⚠" : ""}
+              </td>
+              <td>{r.played}</td>
+              <td>{r.won}</td>
+              <td>{r.draw}</td>
+              <td>{r.lost}</td>
+              <td>{r.gd}</td>
+              <td>{r.gf}</td>
+              <td className="st-pts">{r.pts}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

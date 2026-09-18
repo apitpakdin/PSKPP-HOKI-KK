@@ -245,68 +245,52 @@
   color: var(--ink);
 }
 
-.standings-head span:last-child {
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.06em;
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.standings-head.gold span:last-child {
-  color: rgba(18, 41, 26, 0.55);
+.standings-table th {
+  text-align: center;
+  font: 600 9px Barlow, sans-serif;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 6px 2px 3px;
 }
 
-.standings-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
+.standings-table th.st-name {
+  text-align: left;
+  padding-left: 12px;
+}
+
+.standings-table td {
+  text-align: center;
+  font: 600 12px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 7px 2px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.standings-row:first-of-type {
-  border-top: none;
+.standings-table td.st-name {
+  text-align: left;
+  padding-left: 12px;
+  font-size: 13px;
 }
 
-.standings-row.qualified {
+.standings-table td.st-pts {
+  font: 700 13px Oswald, sans-serif;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.standings-table tr.qualified {
   background: rgba(232, 178, 30, 0.12);
 }
 
-.standings-rank {
-  width: 18px;
-  font: 700 12px Oswald, sans-serif;
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.standings-row.qualified .standings-rank {
-  color: var(--gold);
-}
-
-.standings-name {
-  flex: 1;
-  font: 600 14px Barlow, sans-serif;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.standings-row.qualified .standings-name {
+.standings-table tr.qualified td {
   color: #fff;
 }
 
-.standings-meta {
-  font: 500 13px Barlow, sans-serif;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.standings-row.qualified .standings-meta {
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.standings-pts {
-  width: 22px;
-  text-align: right;
-  font: 700 14px Oswald, sans-serif;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.standings-row.qualified .standings-pts {
+.standings-table tr.qualified td.st-pts {
   color: var(--gold);
 }
 
