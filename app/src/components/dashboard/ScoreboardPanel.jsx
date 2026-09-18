@@ -5,6 +5,15 @@ import { useTournamentDispatch } from "../../state/TournamentContext";
 export default function ScoreboardPanel({ state, selectedId, onSelect, match, list }) {
   const dispatch = useTournamentDispatch();
   const options = allMatchesWithList(state).filter(({ m }) => m.teamA && m.teamB);
+  // Only one match is ever actually being played at a time on the pitch --
+  // if urusetia forgets to press "Tamatkan perlawanan" on the previous one
+  // before selecting and starting the next, both end up marked live at
+  // once, which then shows as two simultaneous "SEDANG BERLANGSUNG" rows
+  // on every participant's phone. Block starting a new one until the old
+  // one is explicitly closed out, rather than letting that slip through.
+  const otherLive = match
+    ? allMatchesWithList(state).find(({ m }) => m.status === "live" && m.id !== match.id)
+    : null;
 
   if (!match) {
     return (
@@ -94,7 +103,12 @@ export default function ScoreboardPanel({ state, selectedId, onSelect, match, li
             : `SUKU KE-${match.quarter} · ${formatClock(match.clockSeconds)}`}
         </div>
         <div className="score-foot-actions">
-          {match.status === "scheduled" && (
+          {match.status === "scheduled" && otherLive && (
+            <div className="chip-warn">
+              Tamatkan "{matchLabel(state, otherLive.m)}" dahulu sebelum mula perlawanan baharu.
+            </div>
+          )}
+          {match.status === "scheduled" && !otherLive && (
             <button
               className="chip-btn gold"
               onClick={() => dispatch({ type: "START_MATCH", list, id: match.id })}

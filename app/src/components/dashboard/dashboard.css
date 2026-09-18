@@ -321,6 +321,14 @@
   opacity: 0.4;
 }
 
+.chip-warn {
+  padding: 7px 12px;
+  border-radius: 7px;
+  background: rgba(179, 38, 30, 0.1);
+  color: #b3261e;
+  font: 600 11.5px Barlow, sans-serif;
+}
+
 .side-col {
   flex: 1;
   min-width: 240px;
