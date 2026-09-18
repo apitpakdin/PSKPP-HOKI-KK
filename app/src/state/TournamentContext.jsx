@@ -152,7 +152,9 @@ function baseReducer(state, action) {
     case "END_QUARTER": {
       const { list, id } = action;
       const apply = (m) => {
-        if (m.quarter >= 4) {
+        // Peraturan 10.1: two 15-minute halves with a 5-minute break
+        // (15:5:15), not four quarters.
+        if (m.quarter >= 2) {
           return { ...m, status: "finished", running: false };
         }
         return { ...m, quarter: m.quarter + 1, clockSeconds: QUARTER_SECONDS, running: false };

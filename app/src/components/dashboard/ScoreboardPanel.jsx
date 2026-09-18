@@ -128,7 +128,7 @@ export default function ScoreboardPanel({ state, selectedId, onSelect, match, li
                 className="chip-btn gold"
                 onClick={() => dispatch({ type: "END_QUARTER", list, id: match.id })}
               >
-                {match.quarter >= 4 ? "Tamatkan perlawanan" : "Tamatkan suku"}
+                {match.quarter >= 2 ? "Tamatkan perlawanan" : "Tamatkan suku"}
               </button>
             </>
           )}

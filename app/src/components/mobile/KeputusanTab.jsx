@@ -30,7 +30,7 @@ function LiveHero({ state, m }) {
         </div>
       </div>
       <div className="live-hero-quarters">
-        {[1, 2, 3, 4].map((q) => (
+        {[1, 2].map((q) => (
           <div key={q} className={q < m.quarter ? "done" : q === m.quarter ? "current" : ""} />
         ))}
       </div>

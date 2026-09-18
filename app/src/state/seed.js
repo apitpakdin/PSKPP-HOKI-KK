@@ -3,7 +3,9 @@
 // (Sabtu 19 Sept: group stage; Ahad 20 Sept: Peringkat XY, tempat ke-3/4,
 // and final).
 
-export const QUARTER_SECONDS = 15 * 60; // 15:5:15 quarters
+// Peraturan 10.1: two 15-minute halves with a 5-minute break (15:5:15) --
+// the `quarter` field name predates this and just means "current half" now.
+export const QUARTER_SECONDS = 15 * 60;
 
 export const teams = {
   A1: { id: "A1", name: "Kinta Utara", group: "A" },
