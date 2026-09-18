@@ -2,6 +2,66 @@ import { useState } from "react";
 import { teamName } from "../../lib/format";
 import { groupStandings, shootoutStandings, xyStandings } from "../../state/standings";
 
+// Tempat Ke-3/4 and the Final don't fit the standings-table shape (each is
+// a single knockout match, not a round-robin group) but peserta still need
+// to see who actually won once they're done -- especially once a shootout
+// was involved, where the tied full-time score alone doesn't say who won.
+function KnockoutResult({ title, m, teams, gold }) {
+  const hasTeams = m.teamA && m.teamB;
+  const showScores = hasTeams && m.status !== "scheduled";
+  const decidedByShootout =
+    m.status === "finished" && m.scoreA === m.scoreB && (m.soScoreA ?? 0) !== (m.soScoreB ?? 0);
+  const aWins = decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA >= m.scoreB;
+  const bWins = decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB >= m.scoreA;
+  const winnerName = decidedByShootout
+    ? teamName(teams, aWins ? m.teamA : m.teamB)
+    : m.scoreA !== m.scoreB
+      ? teamName(teams, m.scoreA > m.scoreB ? m.teamA : m.teamB)
+      : null;
+
+  return (
+    <div className="standings-group">
+      <div className={`standings-head ${gold ? "gold" : ""}`}>
+        <span>{title}</span>
+        <span>{m.time}</span>
+      </div>
+      <div className="knockout-body">
+        {!hasTeams ? (
+          <div className="knockout-pending">Menunggu peringkat kumpulan tamat.</div>
+        ) : (
+          <>
+            <div className={`knockout-row ${m.status === "finished" && aWins ? "win" : ""}`}>
+              <span>{teamName(teams, m.teamA)}</span>
+              {showScores && <span className="knockout-score">{m.scoreA}</span>}
+            </div>
+            <div className={`knockout-row ${m.status === "finished" && bWins ? "win" : ""}`}>
+              <span>{teamName(teams, m.teamB)}</span>
+              {showScores && <span className="knockout-score">{m.scoreB}</span>}
+            </div>
+            {m.status === "scheduled" && (
+              <div className="knockout-note">Belum bermula</div>
+            )}
+            {m.status === "shootout" && (
+              <div className="knockout-note">
+                ⚠ Seri {m.scoreA}–{m.scoreB} · shootout sedang dijalankan (
+                {m.soScoreA ?? 0}–{m.soScoreB ?? 0})
+              </div>
+            )}
+            {m.status === "finished" && decidedByShootout && (
+              <div className="knockout-note champion">
+                ✓ {winnerName} menang shootout {m.soScoreA}–{m.soScoreB}
+              </div>
+            )}
+            {m.status === "finished" && !decidedByShootout && winnerName && (
+              <div className="knockout-note champion">✓ {winnerName} menang</div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ShootoutInfo({ group, tiedCount, state }) {
   const fixtures = state.shootouts?.[group];
   const nameOf = (id) => teamName(state.teams, id);
@@ -158,6 +218,8 @@ export default function KedudukanTab({ state }) {
               state={state}
               gold
             />
+            <KnockoutResult title="TEMPAT KE-3/4" m={state.thirdPlace} teams={state.teams} />
+            <KnockoutResult title="PERLAWANAN AKHIR" m={state.final} teams={state.teams} gold />
           </>
         ) : (
           <div className="empty-note">Undian Peringkat XY belum dijalankan.</div>

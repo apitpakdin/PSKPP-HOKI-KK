@@ -326,6 +326,50 @@
   color: var(--gold);
 }
 
+.knockout-body {
+  padding: 12px 13px 14px;
+}
+
+.knockout-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font: 600 14px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.knockout-row.win {
+  color: #fff;
+  font-weight: 700;
+}
+
+.knockout-score {
+  font: 700 15px Oswald, sans-serif;
+}
+
+.knockout-row.win .knockout-score {
+  color: var(--gold);
+}
+
+.knockout-note {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font: 600 11px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.knockout-note.champion {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.knockout-pending {
+  font: 500 12px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .shootout-info {
   padding: 9px 13px 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
