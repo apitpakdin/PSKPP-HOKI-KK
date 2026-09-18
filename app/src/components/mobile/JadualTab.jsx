@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { teamName } from "../../lib/format";
+import {
+  downloadWorkbook,
+  generateMatchFormWorkbook,
+  matchFormFilename,
+} from "../../lib/matchForm";
+import { fetchPlayers } from "../../lib/roster";
 
-function MatchRow({ state, m }) {
+function MatchRow({ state, m, formBusy, onPrint }) {
   const teams = state.teams;
   const [time, ampm] = m.time.split(" ");
   const isLive = m.status === "live";
@@ -47,13 +53,40 @@ function MatchRow({ state, m }) {
         )}
       </div>
       {isFinished && <div className="match-status">TAMAT</div>}
+      {m.teamA && m.teamB && (
+        <button
+          className="match-form-btn"
+          disabled={formBusy === m.id}
+          onClick={() => onPrint(m)}
+        >
+          {formBusy === m.id ? "…" : "Borang"}
+        </button>
+      )}
     </div>
   );
 }
 
 export default function JadualTab({ state }) {
   const [day, setDay] = useState("sat");
+  const [players, setPlayers] = useState([]);
+  const [formBusy, setFormBusy] = useState(null);
   const list = day === "sat" ? state.saturday : [...state.sunday, state.thirdPlace, state.final];
+
+  useEffect(() => {
+    fetchPlayers()
+      .then(setPlayers)
+      .catch(() => {});
+  }, []);
+
+  const handlePrint = async (m) => {
+    setFormBusy(m.id);
+    try {
+      const wb = await generateMatchFormWorkbook(state, m, players);
+      await downloadWorkbook(wb, matchFormFilename(state, m));
+    } finally {
+      setFormBusy(null);
+    }
+  };
 
   return (
     <>
@@ -80,7 +113,7 @@ export default function JadualTab({ state }) {
           </div>
         )}
         {list.map((m) => (
-          <MatchRow key={m.id} state={state} m={m} />
+          <MatchRow key={m.id} state={state} m={m} formBusy={formBusy} onPrint={handlePrint} />
         ))}
       </div>
     </>
