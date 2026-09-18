@@ -15,7 +15,13 @@ export function findMatch(state, id) {
 
 export function matchLabel(state, m) {
   const group =
-    m.phase === "final" ? "Akhir" : m.phase === "third" ? "Tempat Ke-3/4" : `Kump ${m.group}`;
+    m.phase === "final"
+      ? "Akhir"
+      : m.phase === "third"
+        ? "Tempat Ke-3/4"
+        : m.phase === "xy"
+          ? `Peringkat ${m.group}`
+          : `Kump ${m.group}`;
   const a = m.teamA ? teamName(state.teams, m.teamA) : "?";
   const b = m.teamB ? teamName(state.teams, m.teamB) : "?";
   return `${m.time} · ${group} · ${a} vs ${b}`;

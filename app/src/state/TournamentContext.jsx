@@ -1,5 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
-import { QUARTER_SECONDS, initialState, sundaySeed, teams } from "./seed";
+import {
+  QUARTER_SECONDS,
+  finalSeed,
+  initialState,
+  saturdaySeed,
+  sundaySeed,
+  teams,
+  thirdPlaceSeed,
+} from "./seed";
 import {
   buildShootoutFixtures,
   buildXYDraw,
@@ -14,6 +22,43 @@ const STORAGE_KEY = "pskpp-hoki-2026";
 const TournamentStateContext = createContext(null);
 const TournamentDispatchContext = createContext(null);
 
+// Merges a saved match's live progress (score, status, quarter, clock,
+// referee) onto a freshly-seeded match, so a corrected schedule (a fixed
+// kickoff time, fixture order, or team slot) always wins over whatever an
+// old save happened to have -- the same problem `teams` had before it was
+// forced fresh, just for the match schedule itself.
+function mergeProgress(fresh, saved) {
+  if (!saved) return fresh;
+  return {
+    ...fresh,
+    scoreA: saved.scoreA ?? fresh.scoreA,
+    scoreB: saved.scoreB ?? fresh.scoreB,
+    status: saved.status ?? fresh.status,
+    quarter: saved.quarter ?? fresh.quarter,
+    clockSeconds: saved.clockSeconds ?? fresh.clockSeconds,
+    running: saved.running ?? fresh.running,
+    refereeId: saved.refereeId ?? fresh.refereeId,
+  };
+}
+
+// thirdPlace/final additionally need teamA/teamB merged in: those are
+// derived dynamically from standings and frozen once the match starts (not
+// re-derivable from a "fresh seed", unlike Saturday/Sunday's fixed slots).
+function mergeProgressWithTeams(fresh, saved) {
+  const merged = mergeProgress(fresh, saved);
+  if (!saved) return merged;
+  return { ...merged, teamA: saved.teamA ?? fresh.teamA, teamB: saved.teamB ?? fresh.teamB };
+}
+
+// Saturday/sunday team slots are fixed by the schedule (Saturday always, and
+// Sunday once the persisted xyDraw is re-applied to the current fixture
+// order), so only mutable progress is merged back in -- an old save's
+// teamA/teamB must never override a corrected fixture order.
+function mergeScheduleList(freshList, savedList) {
+  const savedById = Object.fromEntries((savedList ?? []).map((m) => [m.id, m]));
+  return freshList.map((fresh) => mergeProgress(fresh, savedById[fresh.id]));
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -22,11 +67,21 @@ function loadState() {
     if (!parsed || !parsed.saturday || !parsed.final) return initialState();
     // Spread over a fresh initialState() so a save from before a field (e.g.
     // thirdPlace, tiebreaks, shootouts) existed still loads instead of
-    // wiping all progress. `teams` is always forced fresh from seed.js --
-    // it's a fixed reference table no reducer action ever mutates, so an
-    // old save's copy (e.g. a team name from before a rename) must never
-    // win over the current source of truth.
-    return { ...initialState(), ...parsed, teams };
+    // wiping all progress. `teams` and the match schedule (saturday/sunday/
+    // thirdPlace/final structure) are always forced fresh from seed.js --
+    // they're fixed source-of-truth data no reducer action mutates, so an
+    // old save's copy (e.g. times/fixture order from before a jadual fix)
+    // must never win over the current source of truth. Only each match's
+    // own live progress is carried over from the save.
+    return {
+      ...initialState(),
+      ...parsed,
+      teams,
+      saturday: mergeScheduleList(saturdaySeed(), parsed.saturday),
+      sunday: mergeScheduleList(sundaySeed(parsed.xyDraw ?? null), parsed.sunday),
+      thirdPlace: mergeProgressWithTeams(thirdPlaceSeed(), parsed.thirdPlace),
+      final: mergeProgressWithTeams(finalSeed(), parsed.final),
+    };
   } catch {
     return initialState();
   }
@@ -123,7 +178,7 @@ function baseReducer(state, action) {
     }
     case "CLEAR_XY_DRAW": {
       if (state.sunday.some((m) => m.status !== "scheduled")) return state;
-      return { ...state, xyDraw: null, sunday: [] };
+      return { ...state, xyDraw: null, sunday: sundaySeed(null) };
     }
     case "START_SHOOTOUT": {
       const { group, teamIds } = action;

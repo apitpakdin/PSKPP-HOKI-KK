@@ -5,6 +5,7 @@ import { teamName } from "../../lib/format";
 function phaseLabel(m) {
   if (m.phase === "final") return "PERLAWANAN AKHIR";
   if (m.phase === "third") return "TEMPAT KE-3/4";
+  if (m.phase === "xy") return `PERINGKAT ${m.group}`;
   return `KUMPULAN ${m.group}`;
 }
 

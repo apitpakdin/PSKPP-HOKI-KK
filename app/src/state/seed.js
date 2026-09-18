@@ -94,8 +94,10 @@ export function saturdaySeed() {
 
 const SUNDAY_TIMES = ["8:30 pg", "9:10 pg", "9:50 pg", "10:30 pg", "11:10 pg", "11:50 pg"];
 
-// draw: { X: [id,id,id], Y: [id,id,id] } seeded 1/2/3 per side
-export function sundaySeed(draw) {
+// draw: { X: [id,id,id], Y: [id,id,id] } seeded 1/2/3 per side, or null
+// before the physical draw happens -- the match times/order are fixed by
+// the official jadual regardless, only the teams are still unknown.
+export function sundaySeed(draw = null) {
   const matches = [];
   for (let round = 0; round < 3; round++) {
     const [x, y] = XY_ROUND_ROBIN_PAIRS[round];
@@ -106,8 +108,8 @@ export function sundaySeed(draw) {
         phase: "xy",
         group: "X",
         time: SUNDAY_TIMES[round * 2],
-        teamA: draw.X[x],
-        teamB: draw.X[y],
+        teamA: draw ? draw.X[x] : null,
+        teamB: draw ? draw.X[y] : null,
       }),
     );
     matches.push(
@@ -117,8 +119,8 @@ export function sundaySeed(draw) {
         phase: "xy",
         group: "Y",
         time: SUNDAY_TIMES[round * 2 + 1],
-        teamA: draw.Y[x],
-        teamB: draw.Y[y],
+        teamA: draw ? draw.Y[x] : null,
+        teamB: draw ? draw.Y[y] : null,
       }),
     );
   }
@@ -155,7 +157,7 @@ export function initialState() {
     teams,
     saturday: saturdaySeed(),
     xyDraw: null,
-    sunday: [],
+    sunday: sundaySeed(null),
     thirdPlace: thirdPlaceSeed(),
     final: finalSeed(),
     tiebreaks: {},

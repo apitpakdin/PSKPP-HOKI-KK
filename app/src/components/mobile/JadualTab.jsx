@@ -11,7 +11,9 @@ function MatchRow({ state, m }) {
       ? "PERLAWANAN AKHIR"
       : m.phase === "third"
         ? "TEMPAT KE-3/4"
-        : `KUMPULAN ${m.group ?? ""}`;
+        : m.phase === "xy"
+          ? `PERINGKAT ${m.group ?? ""}`
+          : `KUMPULAN ${m.group ?? ""}`;
 
   return (
     <div className={`match-row ${m.status}`}>
@@ -73,8 +75,8 @@ export default function JadualTab({ state }) {
       <div className="mobile-content">
         {day === "sun" && !state.xyDraw && (
           <div className="empty-note">
-            Peringkat XY akan dipaparkan di sini selepas peringkat kumpulan tamat dan undian
-            dijalankan.
+            Masa Peringkat XY di bawah sudah ditetapkan — nama pasukan akan dipaparkan sebaik
+            sahaja peringkat kumpulan tamat dan undian dijalankan.
           </div>
         )}
         {list.map((m) => (

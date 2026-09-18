@@ -15,6 +15,7 @@ const DAY_LABEL = { sat: "SABTU 19 SEPTEMBER", sun: "AHAD 20 SEPTEMBER" };
 function rowGroup(m) {
   if (m.phase === "final") return "Akhir";
   if (m.phase === "third") return "Tempat 3/4";
+  if (m.phase === "xy") return `Peringkat ${m.group}`;
   return `Kump ${m.group}`;
 }
 
