@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { teamName } from "../../lib/format";
-import { groupStandings, saturdayComplete, shootoutStandings, xyStandings } from "../../state/standings";
+import { groupStandings, shootoutStandings, xyStandings } from "../../state/standings";
 
 function ShootoutInfo({ group, tiedCount, state }) {
   const fixtures = state.shootouts?.[group];
@@ -95,7 +95,6 @@ function StandingsTable({ title, rows, gold, group, state }) {
 export default function KedudukanTab({ state }) {
   const [stage, setStage] = useState("group");
   const done = state.saturday.filter((m) => m.status === "finished").length;
-  const complete = saturdayComplete(state);
 
   return (
     <>
@@ -143,13 +142,6 @@ export default function KedudukanTab({ state }) {
               group="C"
               state={state}
             />
-            <div className="callout">
-              <span className="diamond" />
-              <p>
-                Johan &amp; naib johan setiap kumpulan layak ke <b>Peringkat XY</b>
-                {complete ? " · undian telah dijalankan di urusetia" : ""}
-              </p>
-            </div>
           </>
         ) : state.xyDraw ? (
           <>

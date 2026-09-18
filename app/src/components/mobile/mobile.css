@@ -59,6 +59,7 @@
 
 .mobile-content {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   background: var(--ink-2);
   padding: 10px 14px 16px;
