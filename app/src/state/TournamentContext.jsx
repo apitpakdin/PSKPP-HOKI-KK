@@ -239,10 +239,24 @@ function baseReducer(state, action) {
 
 export function TournamentProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, undefined, () => syncDerivedTeams(loadState()));
-  // Set right before dispatching SYNC_REMOTE so the push-effect below skips
-  // that render -- otherwise every incoming update would immediately be
-  // pushed straight back out, echoing forever between every open browser.
-  const skipNextPush = useRef(false);
+  // Highest revision (a Date.now() timestamp) this device has accepted,
+  // whether from its own confirmed push or a remote update. A delayed/
+  // out-of-order update from *before* a newer local change (e.g. urusetia
+  // starts the next match, but a stale echo of the previous state arrives
+  // moments later) is recognised as stale by this and dropped instead of
+  // silently reverting the newer state.
+  const lastRev = useRef(0);
+  // Revisions this device has pushed but not yet seen echoed back (or
+  // confirmed) -- lets a self-echo be recognised and skipped *immediately*,
+  // without waiting on lastRev to have been bumped first. Without this, if
+  // the Realtime echo of our own write happens to arrive before the REST
+  // upsert's own response does (plausible -- the websocket is often faster
+  // than a full request/response round trip), the echo would look "newer
+  // than anything seen so far" and get re-applied via SYNC_REMOTE, which
+  // changes the state reference and re-triggers the push effect below --
+  // pushing the same content again under a new rev, which echoes again,
+  // forever: a self-sustaining update loop.
+  const pendingSelfRevs = useRef(new Set());
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -251,22 +265,30 @@ export function TournamentProvider({ children }) {
   // Push this device's state to the shared Supabase row so every other open
   // browser (urusetia and every peserta phone) can see it live. RLS only
   // lets an authenticated (signed-in urusetia) session's write actually
-  // land -- a peserta browser's attempt is silently rejected, which is fine,
-  // it only ever needs to read. Debounced slightly so a burst of changes in
-  // the same tick (e.g. a score click plus the next TICK) coalesces into one
-  // request instead of several.
+  // land -- a peserta browser's attempt is rejected, which is fine, it only
+  // ever needs to read. `lastRev` is only advanced once the write is
+  // *confirmed* to have landed (supabase-js resolves with an `error` field
+  // rather than rejecting on an RLS denial) -- bumping it optimistically
+  // would let a peserta phone's own stream of rejected attempts poison its
+  // own revision counter and make it start ignoring urusetia's real,
+  // legitimately-older-looking updates. Debounced slightly so a burst of
+  // changes in the same tick (e.g. a score click plus the next TICK)
+  // coalesces into one request instead of several.
   useEffect(() => {
-    if (skipNextPush.current) {
-      skipNextPush.current = false;
-      return;
-    }
     const timeout = setTimeout(() => {
+      const rev = Date.now();
+      pendingSelfRevs.current.add(rev);
       supabase
         .from("tournament_state")
-        .upsert({ id: REMOTE_ID, data: state })
+        .upsert({ id: REMOTE_ID, data: { ...state, _rev: rev } })
         .then(
-          () => {},
-          () => {},
+          ({ error }) => {
+            pendingSelfRevs.current.delete(rev);
+            if (!error) lastRev.current = Math.max(lastRev.current, rev);
+          },
+          () => {
+            pendingSelfRevs.current.delete(rev);
+          },
         );
     }, 300);
     return () => clearTimeout(timeout);
@@ -278,16 +300,30 @@ export function TournamentProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
 
+    const applyRemote = (remoteData) => {
+      if (!remoteData) return;
+      const { _rev, ...remoteState } = remoteData;
+      if (typeof _rev === "number") {
+        if (pendingSelfRevs.current.has(_rev)) {
+          // Our own write, echoed back -- already applied locally, and
+          // re-dispatching it would only feed the loop described above.
+          pendingSelfRevs.current.delete(_rev);
+          lastRev.current = Math.max(lastRev.current, _rev);
+          return;
+        }
+        if (_rev <= lastRev.current) return; // stale/duplicate, ignore
+        lastRev.current = _rev;
+      }
+      dispatch({ type: "SYNC_REMOTE", state: remoteState });
+    };
+
     supabase
       .from("tournament_state")
       .select("data")
       .eq("id", REMOTE_ID)
       .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled && data?.data) {
-          skipNextPush.current = true;
-          dispatch({ type: "SYNC_REMOTE", state: data.data });
-        }
+        if (!cancelled) applyRemote(data?.data);
       })
       .catch(() => {});
 
@@ -296,12 +332,7 @@ export function TournamentProvider({ children }) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "tournament_state", filter: `id=eq.${REMOTE_ID}` },
-        (payload) => {
-          if (payload.new?.data) {
-            skipNextPush.current = true;
-            dispatch({ type: "SYNC_REMOTE", state: payload.new.data });
-          }
-        },
+        (payload) => applyRemote(payload.new?.data),
       )
       .subscribe();
 
