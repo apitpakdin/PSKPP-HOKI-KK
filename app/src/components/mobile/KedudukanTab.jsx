@@ -2,9 +2,53 @@ import { useState } from "react";
 import { teamName } from "../../lib/format";
 import { groupStandings, saturdayComplete, shootoutStandings, xyStandings } from "../../state/standings";
 
-const GROUPS = ["A", "B", "C"];
+function ShootoutInfo({ group, tiedCount, state }) {
+  const fixtures = state.shootouts?.[group];
+  const nameOf = (id) => teamName(state.teams, id);
 
-function StandingsTable({ label, rows, gold }) {
+  if (!fixtures || !fixtures.length) {
+    return (
+      <div className="shootout-info">
+        <div className="shootout-warn">
+          ⚠ {tiedCount} pasukan seri penuh — menunggu shootout dijalankan oleh urusetia.
+        </div>
+      </div>
+    );
+  }
+
+  const allDone = fixtures.every((m) => m.status === "finished");
+  const rows = allDone ? shootoutStandings(state, group) : null;
+  const resolved = rows && rows.length > 0 && rows.every((r) => !r.needsShootout);
+
+  return (
+    <div className="shootout-info">
+      <div className="shootout-warn">⚠ Keputusan shootout</div>
+      {fixtures.map((m) => (
+        <div className="shootout-row" key={m.id}>
+          <span>{nameOf(m.teamA)}</span>
+          <span className="shootout-score">
+            {m.status === "finished" ? `${m.scoreA} – ${m.scoreB}` : "menunggu"}
+          </span>
+          <span>{nameOf(m.teamB)}</span>
+        </div>
+      ))}
+      {resolved && (
+        <div className="shootout-result">
+          ✓ Keputusan: {rows.map((r, i) => `${i + 1}) ${nameOf(r.id)}`).join(" · ")}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Each group's table and its own shootout section (if it needs one) live in
+// one card together, right where the group is, rather than as a separate
+// block stacked below every table -- keeps a group's own tie-break info
+// next to that group instead of pushed down past other groups' results.
+function StandingsTable({ label, rows, gold, group, state }) {
+  const tied = rows.filter((r) => r.needsShootout);
+  const showShootout = tied.length > 0 || Boolean(state.shootouts?.[group]);
+
   return (
     <div className="standings-group">
       <div className={`standings-head ${gold ? "gold" : ""}`}>
@@ -41,46 +85,7 @@ function StandingsTable({ label, rows, gold }) {
           ))}
         </tbody>
       </table>
-    </div>
-  );
-}
-
-function ShootoutInfo({ group, tiedCount, state }) {
-  const fixtures = state.shootouts?.[group];
-  const nameOf = (id) => teamName(state.teams, id);
-
-  if (!fixtures || !fixtures.length) {
-    return (
-      <div className="shootout-info">
-        <div className="shootout-warn">
-          ⚠ Kumpulan {group}: {tiedCount} pasukan seri penuh — menunggu shootout dijalankan oleh
-          urusetia.
-        </div>
-      </div>
-    );
-  }
-
-  const allDone = fixtures.every((m) => m.status === "finished");
-  const rows = allDone ? shootoutStandings(state, group) : null;
-  const resolved = rows && rows.length > 0 && rows.every((r) => !r.needsShootout);
-
-  return (
-    <div className="shootout-info">
-      <div className="shootout-warn">⚠ Keputusan shootout Kumpulan {group}</div>
-      {fixtures.map((m) => (
-        <div className="shootout-row" key={m.id}>
-          <span>{nameOf(m.teamA)}</span>
-          <span className="shootout-score">
-            {m.status === "finished" ? `${m.scoreA} – ${m.scoreB}` : "menunggu"}
-          </span>
-          <span>{nameOf(m.teamB)}</span>
-        </div>
-      ))}
-      {resolved && (
-        <div className="shootout-result">
-          ✓ Keputusan: {rows.map((r, i) => `${i + 1}) ${nameOf(r.id)}`).join(" · ")}
-        </div>
-      )}
+      {showShootout && <ShootoutInfo group={group} tiedCount={tied.length} state={state} />}
     </div>
   );
 }
@@ -117,16 +122,15 @@ export default function KedudukanTab({ state }) {
       <div className="mobile-content">
         {stage === "group" ? (
           <>
-            <StandingsTable label="A" rows={groupStandings(state, "A")} />
-            <StandingsTable label="B" rows={groupStandings(state, "B")} gold />
-            <StandingsTable label="C" rows={groupStandings(state, "C")} />
-            {GROUPS.map((g) => {
-              const tied = groupStandings(state, g).filter((r) => r.needsShootout);
-              if (!tied.length && !state.shootouts?.[g]) return null;
-              return (
-                <ShootoutInfo key={g} group={g} tiedCount={tied.length} state={state} />
-              );
-            })}
+            <StandingsTable label="A" rows={groupStandings(state, "A")} group="A" state={state} />
+            <StandingsTable
+              label="B"
+              rows={groupStandings(state, "B")}
+              group="B"
+              state={state}
+              gold
+            />
+            <StandingsTable label="C" rows={groupStandings(state, "C")} group="C" state={state} />
             <div className="callout">
               <span className="diamond" />
               <p>
@@ -137,15 +141,14 @@ export default function KedudukanTab({ state }) {
           </>
         ) : state.xyDraw ? (
           <>
-            <StandingsTable label="X" rows={xyStandings(state, "X")} />
-            <StandingsTable label="Y" rows={xyStandings(state, "Y")} gold />
-            {["X", "Y"].map((g) => {
-              const tied = xyStandings(state, g).filter((r) => r.needsShootout);
-              if (!tied.length && !state.shootouts?.[g]) return null;
-              return (
-                <ShootoutInfo key={g} group={g} tiedCount={tied.length} state={state} />
-              );
-            })}
+            <StandingsTable label="X" rows={xyStandings(state, "X")} group="X" state={state} />
+            <StandingsTable
+              label="Y"
+              rows={xyStandings(state, "Y")}
+              group="Y"
+              state={state}
+              gold
+            />
           </>
         ) : (
           <div className="empty-note">Undian Peringkat XY belum dijalankan.</div>

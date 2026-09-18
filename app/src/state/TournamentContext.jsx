@@ -259,6 +259,17 @@ export function TournamentProvider({ children }) {
   // pushing the same content again under a new rev, which echoes again,
   // forever: a self-sustaining update loop.
   const pendingSelfRevs = useRef(new Set());
+  // Timestamp of the most recent *local* dispatch not yet confirmed pushed.
+  // Closes a narrower version of the same problem lastRev/pendingSelfRevs
+  // solve: right after a local action (e.g. "Set semula"), there's a ~300ms
+  // debounce window before a rev even exists for it yet, during which an
+  // already-in-flight fetch from *before* the action can still resolve and
+  // carry an old (but individually valid, rev <= lastRev not yet true since
+  // lastRev may still be 0 this early) snapshot -- applying it would
+  // silently undo the action the user just took. Never cleared back to 0:
+  // once the corresponding push confirms, lastRev overtakes it anyway, so
+  // it simply stops mattering rather than needing to be reset.
+  const pendingFloor = useRef(0);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -277,6 +288,7 @@ export function TournamentProvider({ children }) {
   // changes in the same tick (e.g. a score click plus the next TICK)
   // coalesces into one request instead of several.
   useEffect(() => {
+    pendingFloor.current = Date.now();
     const timeout = setTimeout(() => {
       const rev = Date.now();
       pendingSelfRevs.current.add(rev);
@@ -322,6 +334,7 @@ export function TournamentProvider({ children }) {
           return;
         }
         if (_rev <= lastRev.current) return; // stale/duplicate, ignore
+        if (pendingFloor.current > 0 && _rev < pendingFloor.current) return; // predates a local edit still in flight
         lastRev.current = _rev;
       } else if (lastRev.current > 0) {
         // No _rev on this payload at all (e.g. a leftover/legacy row shape,
