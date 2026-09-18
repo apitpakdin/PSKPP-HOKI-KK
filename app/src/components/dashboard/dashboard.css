@@ -467,7 +467,18 @@
 
 .stand-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
+}
+
+.stand-table th,
+.stand-table td {
+  width: 8.25%;
+}
+
+.stand-table th.stand-name,
+.stand-table td.stand-name {
+  width: 34%;
 }
 
 .stand-table th {
@@ -487,6 +498,9 @@
   font: 600 12.5px Barlow, sans-serif;
   color: var(--ink);
   padding: 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stand-table td.stand-name {
