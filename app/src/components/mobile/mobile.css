@@ -247,7 +247,18 @@
 
 .standings-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
+}
+
+.standings-table th,
+.standings-table td {
+  width: 8.7%;
+}
+
+.standings-table th.st-name,
+.standings-table td.st-name {
+  width: 39%;
 }
 
 .standings-table th {
@@ -269,6 +280,9 @@
   color: rgba(255, 255, 255, 0.7);
   padding: 7px 2px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .standings-table td.st-name {
