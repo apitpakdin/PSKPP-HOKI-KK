@@ -10,11 +10,14 @@ function phaseLabel(m) {
 }
 
 function LiveHero({ state, m }) {
+  const isShootout = m.status === "shootout";
   return (
     <div className="live-hero">
       <div className="live-hero-tag">
         <span className="dot" />
-        <span>LANGSUNG · {phaseLabel(m)}</span>
+        <span>
+          {isShootout ? "SHOOTOUT" : "LANGSUNG"} · {phaseLabel(m)}
+        </span>
       </div>
       <div className="live-hero-score">
         <div className="live-hero-team">
@@ -29,14 +32,24 @@ function LiveHero({ state, m }) {
           <div className="name">{teamName(state.teams, m.teamB)}</div>
         </div>
       </div>
-      <div className="live-hero-quarters">
-        {[1, 2].map((q) => (
-          <div key={q} className={q < m.quarter ? "done" : q === m.quarter ? "current" : ""} />
-        ))}
-      </div>
-      <div className="live-hero-foot">
-        <span>SUKU KE-{m.quarter} · 15:5:15</span>
-      </div>
+      {isShootout ? (
+        <div className="live-hero-foot">
+          <span>
+            SERI SELEPAS MASA TAMAT · SHOOTOUT {m.soScoreA ?? 0}–{m.soScoreB ?? 0}
+          </span>
+        </div>
+      ) : (
+        <>
+          <div className="live-hero-quarters">
+            {[1, 2].map((q) => (
+              <div key={q} className={q < m.quarter ? "done" : q === m.quarter ? "current" : ""} />
+            ))}
+          </div>
+          <div className="live-hero-foot">
+            <span>SUKU KE-{m.quarter} · 15:5:15</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -68,23 +81,33 @@ export default function KeputusanTab({ state }) {
         )}
         <div className="section-label">SELESAI {day === "sat" ? "HARI INI" : "AHAD"}</div>
         {finished.length === 0 && <div className="empty-note">Belum ada keputusan.</div>}
-        {finished.map((m) => (
-          <div key={m.id} className="finished-row">
-            <div style={{ flex: 1 }}>
-              <div className="meta">
-                {phaseLabel(m)} · {m.time}
-              </div>
-              <div className={`line ${m.scoreA >= m.scoreB ? "winner" : ""}`}>
-                <span>{teamName(state.teams, m.teamA)}</span>
-                <span className="score">{m.scoreA}</span>
-              </div>
-              <div className={`line ${m.scoreB >= m.scoreA ? "winner" : ""}`}>
-                <span>{teamName(state.teams, m.teamB)}</span>
-                <span className="score">{m.scoreB}</span>
+        {finished.map((m) => {
+          const decidedByShootout = m.scoreA === m.scoreB && (m.soScoreA ?? 0) !== (m.soScoreB ?? 0);
+          const aWins = decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA >= m.scoreB;
+          const bWins = decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB >= m.scoreA;
+          return (
+            <div key={m.id} className="finished-row">
+              <div style={{ flex: 1 }}>
+                <div className="meta">
+                  {phaseLabel(m)} · {m.time}
+                </div>
+                <div className={`line ${aWins ? "winner" : ""}`}>
+                  <span>{teamName(state.teams, m.teamA)}</span>
+                  <span className="score">{m.scoreA}</span>
+                </div>
+                <div className={`line ${bWins ? "winner" : ""}`}>
+                  <span>{teamName(state.teams, m.teamB)}</span>
+                  <span className="score">{m.scoreB}</span>
+                </div>
+                {decidedByShootout && (
+                  <div className="match-shootout-note">
+                    Menang shootout {m.soScoreA}–{m.soScoreB}
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </>
   );

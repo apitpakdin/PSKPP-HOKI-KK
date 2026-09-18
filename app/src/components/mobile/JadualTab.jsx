@@ -5,7 +5,15 @@ function MatchRow({ state, m }) {
   const teams = state.teams;
   const [time, ampm] = m.time.split(" ");
   const isLive = m.status === "live";
+  const isShootout = m.status === "shootout";
   const isFinished = m.status === "finished";
+  // A knockout draw is settled by shootout, so once finished with an equal
+  // regulation score, the shootout score decides who actually won -- only
+  // once it's actually confirmed finished, not while still mid-shootout.
+  const decidedByShootout =
+    isFinished && m.scoreA === m.scoreB && (m.soScoreA ?? 0) !== (m.soScoreB ?? 0);
+  const aWins = decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA >= m.scoreB;
+  const bWins = decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB >= m.scoreA;
   const groupLabel =
     m.phase === "final"
       ? "PERLAWANAN AKHIR"
@@ -24,19 +32,28 @@ function MatchRow({ state, m }) {
       <div className="match-divider" />
       <div className="match-body">
         <div className="match-group-label">
-          {isLive && <span className="live-dot" />}
-          {isLive ? `SEDANG BERLANGSUNG · SUKU ${m.quarter}` : groupLabel}
+          {(isLive || isShootout) && <span className="live-dot" />}
+          {isLive
+            ? `SEDANG BERLANGSUNG · SUKU ${m.quarter}`
+            : isShootout
+              ? "SERI · SHOOTOUT SEDANG DIJALANKAN"
+              : groupLabel}
         </div>
-        {isFinished || isLive ? (
+        {isFinished || isLive || isShootout ? (
           <>
-            <div className={`match-teamline ${m.scoreA >= m.scoreB ? "win" : ""}`}>
+            <div className={`match-teamline ${aWins ? "win" : ""}`}>
               <span>{teamName(teams, m.teamA)}</span>
               <span className="match-score">{m.scoreA}</span>
             </div>
-            <div className={`match-teamline ${m.scoreB >= m.scoreA ? "win" : ""}`}>
+            <div className={`match-teamline ${bWins ? "win" : ""}`}>
               <span>{teamName(teams, m.teamB)}</span>
               <span className="match-score">{m.scoreB}</span>
             </div>
+            {decidedByShootout && (
+              <div className="match-shootout-note">
+                Menang shootout {m.soScoreA}–{m.soScoreB}
+              </div>
+            )}
           </>
         ) : (
           <div className="match-static-teams">

@@ -15,8 +15,8 @@ import "./dashboard.css";
 
 function defaultSelection(state) {
   const all = allMatchesWithList(state);
-  const live = all.find(({ m }) => m.status === "live");
-  if (live) return live.m.id;
+  const active = all.find(({ m }) => m.status === "live" || m.status === "shootout");
+  if (active) return active.m.id;
   const next = all.find(({ m }) => m.status === "scheduled" && m.teamA && m.teamB);
   return next ? next.m.id : all[0].m.id;
 }

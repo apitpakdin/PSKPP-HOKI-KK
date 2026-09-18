@@ -32,11 +32,16 @@ function blankMatch({ id, day, phase, group, time, teamA, teamB }) {
     teamB,
     scoreA: 0,
     scoreB: 0,
-    status: "scheduled", // scheduled | live | finished
+    status: "scheduled", // scheduled | live | shootout | finished
     quarter: 1,
     clockSeconds: QUARTER_SECONDS,
     running: false,
     refereeId: null,
+    // Peraturan (final/tempat ke-3/4): a draw after full time must be
+    // settled by a shootout -- these only ever get used on those two
+    // matches, but every match carries the fields for a uniform shape.
+    soScoreA: 0,
+    soScoreB: 0,
   };
 }
 

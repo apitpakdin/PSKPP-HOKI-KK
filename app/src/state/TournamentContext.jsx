@@ -40,6 +40,8 @@ function mergeProgress(fresh, saved) {
     clockSeconds: saved.clockSeconds ?? fresh.clockSeconds,
     running: saved.running ?? fresh.running,
     refereeId: saved.refereeId ?? fresh.refereeId,
+    soScoreA: saved.soScoreA ?? fresh.soScoreA,
+    soScoreB: saved.soScoreB ?? fresh.soScoreB,
   };
 }
 
@@ -155,6 +157,14 @@ function baseReducer(state, action) {
         // Peraturan 10.1: two 15-minute halves with a 5-minute break
         // (15:5:15), not four quarters.
         if (m.quarter >= 2) {
+          // Final and tempat ke-3/4 are knockout matches -- a draw after
+          // full time must be settled by a shootout, not left as a tied
+          // result, unlike group/Peringkat XY matches (which use table
+          // tie-breaks instead).
+          const isKnockout = m.phase === "final" || m.phase === "third";
+          if (isKnockout && m.scoreA === m.scoreB) {
+            return { ...m, status: "shootout", running: false };
+          }
           return { ...m, status: "finished", running: false };
         }
         return { ...m, quarter: m.quarter + 1, clockSeconds: QUARTER_SECONDS, running: false };
@@ -167,6 +177,25 @@ function baseReducer(state, action) {
       const apply = (m) => ({ ...m, status: "finished", running: false });
       if (list === "final" || list === "thirdPlace") return { ...state, [list]: apply(state[list]) };
       return { ...state, [list]: updateMatchInList(state[list], id, apply) };
+    }
+    // Only ever dispatched for "final"/"thirdPlace", whose value in state is
+    // the match object itself (not a list) -- Peraturan requires a shootout
+    // to settle a knockout draw, tracked on the match's own soScoreA/soScoreB
+    // rather than the group-standings shootout machinery below (which is
+    // built around round-robin ties among 2-3 teams, not a single match).
+    case "ADJUST_KNOCKOUT_SHOOTOUT": {
+      const { list, side, delta } = action;
+      if (list !== "final" && list !== "thirdPlace") return state;
+      const key = side === "A" ? "soScoreA" : "soScoreB";
+      const m = state[list];
+      return { ...state, [list]: { ...m, [key]: Math.max(0, (m[key] ?? 0) + delta) } };
+    }
+    case "FINISH_KNOCKOUT_SHOOTOUT": {
+      const { list } = action;
+      if (list !== "final" && list !== "thirdPlace") return state;
+      const m = state[list];
+      if ((m.soScoreA ?? 0) === (m.soScoreB ?? 0)) return state;
+      return { ...state, [list]: { ...m, status: "finished" } };
     }
     case "TICK": {
       const tick = (m) =>
@@ -425,6 +454,6 @@ export function useCurrentLive(state) {
     const all = [...state.saturday, ...state.sunday, state.thirdPlace, state.final].filter(
       Boolean,
     );
-    return all.find((m) => m.status === "live") ?? null;
+    return all.find((m) => m.status === "live" || m.status === "shootout") ?? null;
   }, [state]);
 }

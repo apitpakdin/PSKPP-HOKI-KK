@@ -152,6 +152,11 @@ export default function XYFlowPanel({ state }) {
               <div className="team">
                 {teamName(state.teams, final.teamB)} {final.scoreB}
               </div>
+              {final.scoreA === final.scoreB && (final.soScoreA ?? 0) !== (final.soScoreB ?? 0) && (
+                <div className="foot">
+                  Menang shootout {final.soScoreA}–{final.soScoreB}
+                </div>
+              )}
             </>
           ) : (
             <>
@@ -166,6 +171,9 @@ export default function XYFlowPanel({ state }) {
               <>
                 {teamName(state.teams, third.teamA)} {third.scoreA} – {third.scoreB}{" "}
                 {teamName(state.teams, third.teamB)}
+                {third.scoreA === third.scoreB && (third.soScoreA ?? 0) !== (third.soScoreB ?? 0)
+                  ? ` (shootout ${third.soScoreA}–${third.soScoreB})`
+                  : ""}
               </>
             ) : (
               <>

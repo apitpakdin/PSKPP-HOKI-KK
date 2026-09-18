@@ -12,7 +12,9 @@ export default function ScoreboardPanel({ state, selectedId, onSelect, match, li
   // on every participant's phone. Block starting a new one until the old
   // one is explicitly closed out, rather than letting that slip through.
   const otherLive = match
-    ? allMatchesWithList(state).find(({ m }) => m.status === "live" && m.id !== match.id)
+    ? allMatchesWithList(state).find(
+        ({ m }) => (m.status === "live" || m.status === "shootout") && m.id !== match.id,
+      )
     : null;
 
   if (!match) {
@@ -48,9 +50,11 @@ export default function ScoreboardPanel({ state, selectedId, onSelect, match, li
         <span>
           {match.status === "live"
             ? "SEDANG BERLANGSUNG"
-            : match.status === "finished"
-              ? "TAMAT"
-              : "BELUM MULA"}{" "}
+            : match.status === "shootout"
+              ? "SERI · SHOOTOUT"
+              : match.status === "finished"
+                ? "TAMAT"
+                : "BELUM MULA"}{" "}
           ·{" "}
           {match.phase === "final"
             ? "PERLAWANAN AKHIR"
@@ -100,7 +104,9 @@ export default function ScoreboardPanel({ state, selectedId, onSelect, match, li
         <div className="score-clock">
           {match.status === "finished"
             ? "PERLAWANAN TAMAT"
-            : `SUKU KE-${match.quarter} · ${formatClock(match.clockSeconds)}`}
+            : match.status === "shootout"
+              ? "MASA TAMAT · SHOOTOUT WAJIB DIJALANKAN"
+              : `SUKU KE-${match.quarter} · ${formatClock(match.clockSeconds)}`}
         </div>
         <div className="score-foot-actions">
           {match.status === "scheduled" && otherLive && (
@@ -134,6 +140,62 @@ export default function ScoreboardPanel({ state, selectedId, onSelect, match, li
           )}
         </div>
       </div>
+
+      {match.status === "shootout" && (
+        <div className="score-foot" style={{ flexDirection: "column", alignItems: "stretch", gap: 10 }}>
+          <div className="chip-warn">
+            Seri {match.scoreA}–{match.scoreB} selepas masa tamat — Peraturan mewajibkan shootout.
+          </div>
+          <div className="score-main">
+            <div className="score-team">
+              <div className="name">{teamName(state.teams, match.teamA)}</div>
+              <div className="score-controls">
+                <button
+                  className="score-btn"
+                  disabled={(match.soScoreA ?? 0) === 0}
+                  onClick={() => dispatch({ type: "ADJUST_KNOCKOUT_SHOOTOUT", list, side: "A", delta: -1 })}
+                >
+                  −
+                </button>
+                <div className="score-num">{match.soScoreA ?? 0}</div>
+                <button
+                  className="score-btn plus"
+                  onClick={() => dispatch({ type: "ADJUST_KNOCKOUT_SHOOTOUT", list, side: "A", delta: 1 })}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="score-vs">–</div>
+            <div className="score-team right">
+              <div className="name">{teamName(state.teams, match.teamB)}</div>
+              <div className="score-controls">
+                <button
+                  className="score-btn"
+                  disabled={(match.soScoreB ?? 0) === 0}
+                  onClick={() => dispatch({ type: "ADJUST_KNOCKOUT_SHOOTOUT", list, side: "B", delta: -1 })}
+                >
+                  −
+                </button>
+                <div className="score-num">{match.soScoreB ?? 0}</div>
+                <button
+                  className="score-btn plus"
+                  onClick={() => dispatch({ type: "ADJUST_KNOCKOUT_SHOOTOUT", list, side: "B", delta: 1 })}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+          <button
+            className="chip-btn gold"
+            disabled={(match.soScoreA ?? 0) === (match.soScoreB ?? 0)}
+            onClick={() => dispatch({ type: "FINISH_KNOCKOUT_SHOOTOUT", list })}
+          >
+            Sahkan keputusan shootout
+          </button>
+        </div>
+      )}
     </div>
   );
 }
