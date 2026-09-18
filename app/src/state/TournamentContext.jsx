@@ -296,7 +296,15 @@ export function TournamentProvider({ children }) {
 
   // Mirror the shared row: fetch its current value once on mount, then
   // subscribe so every score/status change urusetia makes anywhere reaches
-  // this device within moments, live.
+  // this device within moments, live. A phone's WebSocket is not reliable
+  // enough to rely on alone, especially outdoors at a turf on shaky wifi/
+  // data, or after the screen locks and the OS suspends the tab -- when it
+  // resumes, the socket can be silently dead with no error ever surfacing,
+  // leaving the page frozen on whatever match was live when it dropped. Two
+  // extra safety nets on top of the subscription: a periodic re-fetch, and
+  // an immediate re-fetch the moment the tab becomes visible again. Both
+  // just call the same applyRemote the subscription uses, so a fetch that
+  // turns out to be no newer than what's already here is a harmless no-op.
   useEffect(() => {
     let cancelled = false;
 
@@ -317,15 +325,19 @@ export function TournamentProvider({ children }) {
       dispatch({ type: "SYNC_REMOTE", state: remoteState });
     };
 
-    supabase
-      .from("tournament_state")
-      .select("data")
-      .eq("id", REMOTE_ID)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!cancelled) applyRemote(data?.data);
-      })
-      .catch(() => {});
+    const fetchNow = () => {
+      supabase
+        .from("tournament_state")
+        .select("data")
+        .eq("id", REMOTE_ID)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!cancelled) applyRemote(data?.data);
+        })
+        .catch(() => {});
+    };
+
+    fetchNow();
 
     const channel = supabase
       .channel("tournament_state_changes")
@@ -336,9 +348,18 @@ export function TournamentProvider({ children }) {
       )
       .subscribe();
 
+    const pollInterval = setInterval(fetchNow, 10000);
+
+    const onVisible = () => {
+      if (!document.hidden) fetchNow();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       cancelled = true;
       supabase.removeChannel(channel);
+      clearInterval(pollInterval);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
