@@ -58,14 +58,14 @@ function StandingsTable({ title, rows, gold, group, state }) {
         <thead>
           <tr>
             <th className="st-name">Pasukan</th>
-            <th>M</th>
-            <th>MG</th>
-            <th>S</th>
-            <th>K</th>
-            <th>BG</th>
-            <th>G</th>
-            <th>BL</th>
-            <th>MT</th>
+            <th title="Perlawanan">P</th>
+            <th title="Menang">M</th>
+            <th title="Seri">S</th>
+            <th title="Kalah">K</th>
+            <th title="Gol">G</th>
+            <th title="Bolos">B</th>
+            <th title="Perbezaan Gol">PG</th>
+            <th title="Mata">M</th>
           </tr>
         </thead>
         <tbody>
@@ -79,9 +79,9 @@ function StandingsTable({ title, rows, gold, group, state }) {
               <td>{r.won}</td>
               <td>{r.draw}</td>
               <td>{r.lost}</td>
-              <td>{r.gd}</td>
               <td>{r.gf}</td>
               <td>{r.ga}</td>
+              <td>{r.gd}</td>
               <td className="st-pts">{r.pts}</td>
             </tr>
           ))}

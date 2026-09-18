@@ -12,14 +12,14 @@ function GroupTable({ title, rows }) {
         <thead>
           <tr>
             <th className="stand-name">Pasukan</th>
-            <th>Main</th>
-            <th>Menang</th>
-            <th>Seri</th>
-            <th>Kalah</th>
-            <th>Beza Gol</th>
-            <th>Gol</th>
-            <th>Bolos</th>
-            <th>Mata</th>
+            <th title="Perlawanan">P</th>
+            <th title="Menang">M</th>
+            <th title="Seri">S</th>
+            <th title="Kalah">K</th>
+            <th title="Gol">G</th>
+            <th title="Bolos">B</th>
+            <th title="Perbezaan Gol">PG</th>
+            <th title="Mata">M</th>
           </tr>
         </thead>
         <tbody>
@@ -33,9 +33,9 @@ function GroupTable({ title, rows }) {
               <td>{r.won}</td>
               <td>{r.draw}</td>
               <td>{r.lost}</td>
-              <td>{r.gd}</td>
               <td>{r.gf}</td>
               <td>{r.ga}</td>
+              <td>{r.gd}</td>
               <td className="stand-pts">{r.pts}</td>
             </tr>
           ))}

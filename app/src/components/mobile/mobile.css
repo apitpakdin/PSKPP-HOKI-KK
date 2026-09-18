@@ -233,9 +233,9 @@
 .standings-head {
   display: flex;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 6px 12px;
   background: var(--ink-3);
-  font: 700 12px Barlow, sans-serif;
+  font: 700 11px Barlow, sans-serif;
   color: #fff;
   letter-spacing: 0.1em;
 }
@@ -263,22 +263,22 @@
 
 .standings-table th {
   text-align: center;
-  font: 600 9px Barlow, sans-serif;
-  letter-spacing: 0.04em;
+  font: 600 8.5px Barlow, sans-serif;
+  letter-spacing: 0.02em;
   color: rgba(255, 255, 255, 0.4);
-  padding: 6px 2px 3px;
+  padding: 4px 1px 2px;
 }
 
 .standings-table th.st-name {
   text-align: left;
-  padding-left: 12px;
+  padding-left: 10px;
 }
 
 .standings-table td {
   text-align: center;
-  font: 600 12px Barlow, sans-serif;
+  font: 600 11px Barlow, sans-serif;
   color: rgba(255, 255, 255, 0.7);
-  padding: 7px 2px;
+  padding: 4.5px 1px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -287,8 +287,8 @@
 
 .standings-table td.st-name {
   text-align: left;
-  padding-left: 12px;
-  font-size: 13px;
+  padding-left: 10px;
+  font-size: 12px;
 }
 
 .standings-table td.st-pts {
