@@ -83,8 +83,9 @@ export default function KeputusanTab({ state }) {
         {finished.length === 0 && <div className="empty-note">Belum ada keputusan.</div>}
         {finished.map((m) => {
           const decidedByShootout = m.scoreA === m.scoreB && (m.soScoreA ?? 0) !== (m.soScoreB ?? 0);
-          const aWins = decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA >= m.scoreB;
-          const bWins = decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB >= m.scoreA;
+          // Strict > (not >=): a genuine draw has no winner to gold-highlight.
+          const aWins = decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA > m.scoreB;
+          const bWins = decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB > m.scoreA;
           return (
             <div key={m.id} className="finished-row">
               <div style={{ flex: 1 }}>

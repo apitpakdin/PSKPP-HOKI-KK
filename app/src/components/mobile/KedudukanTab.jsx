@@ -11,8 +11,8 @@ function KnockoutResult({ title, m, teams, gold }) {
   const showScores = hasTeams && m.status !== "scheduled";
   const decidedByShootout =
     m.status === "finished" && m.scoreA === m.scoreB && (m.soScoreA ?? 0) !== (m.soScoreB ?? 0);
-  const aWins = decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA >= m.scoreB;
-  const bWins = decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB >= m.scoreA;
+  const aWins = decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA > m.scoreB;
+  const bWins = decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB > m.scoreA;
   const winnerName = decidedByShootout
     ? teamName(teams, aWins ? m.teamA : m.teamB)
     : m.scoreA !== m.scoreB

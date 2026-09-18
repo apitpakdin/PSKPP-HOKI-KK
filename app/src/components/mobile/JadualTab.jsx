@@ -12,8 +12,11 @@ function MatchRow({ state, m }) {
   // once it's actually confirmed finished, not while still mid-shootout.
   const decidedByShootout =
     isFinished && m.scoreA === m.scoreB && (m.soScoreA ?? 0) !== (m.soScoreB ?? 0);
-  const aWins = decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA >= m.scoreB;
-  const bWins = decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB >= m.scoreA;
+  // Only ever highlight a team once the match is actually decided -- never
+  // both on a genuine draw (no winner to gold-highlight), and never while
+  // still live/mid-shootout (nothing is final yet).
+  const aWins = isFinished && (decidedByShootout ? m.soScoreA > m.soScoreB : m.scoreA > m.scoreB);
+  const bWins = isFinished && (decidedByShootout ? m.soScoreB > m.soScoreA : m.scoreB > m.scoreA);
   const groupLabel =
     m.phase === "final"
       ? "PERLAWANAN AKHIR"

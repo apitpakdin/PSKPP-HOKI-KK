@@ -167,7 +167,8 @@
 }
 
 .match-teamline.win {
-  color: #fff;
+  color: var(--gold);
+  font-weight: 700;
 }
 
 .match-row.live .match-teamline,
@@ -340,7 +341,7 @@
 }
 
 .knockout-row.win {
-  color: #fff;
+  color: var(--gold);
   font-weight: 700;
 }
 
@@ -569,7 +570,8 @@
 }
 
 .finished-row .line.winner {
-  color: #fff;
+  color: var(--gold);
+  font-weight: 700;
 }
 
 .finished-row .line .score {
