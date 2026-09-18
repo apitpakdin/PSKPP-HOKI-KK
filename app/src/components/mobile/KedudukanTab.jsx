@@ -45,14 +45,14 @@ function ShootoutInfo({ group, tiedCount, state }) {
 // one card together, right where the group is, rather than as a separate
 // block stacked below every table -- keeps a group's own tie-break info
 // next to that group instead of pushed down past other groups' results.
-function StandingsTable({ label, rows, gold, group, state }) {
+function StandingsTable({ title, rows, gold, group, state }) {
   const tied = rows.filter((r) => r.needsShootout);
   const showShootout = tied.length > 0 || Boolean(state.shootouts?.[group]);
 
   return (
     <div className="standings-group">
       <div className={`standings-head ${gold ? "gold" : ""}`}>
-        <span>KUMPULAN {label}</span>
+        <span>{title}</span>
       </div>
       <table className="standings-table">
         <thead>
@@ -64,6 +64,7 @@ function StandingsTable({ label, rows, gold, group, state }) {
             <th>K</th>
             <th>BG</th>
             <th>G</th>
+            <th>BL</th>
             <th>MT</th>
           </tr>
         </thead>
@@ -80,6 +81,7 @@ function StandingsTable({ label, rows, gold, group, state }) {
               <td>{r.lost}</td>
               <td>{r.gd}</td>
               <td>{r.gf}</td>
+              <td>{r.ga}</td>
               <td className="st-pts">{r.pts}</td>
             </tr>
           ))}
@@ -122,15 +124,25 @@ export default function KedudukanTab({ state }) {
       <div className="mobile-content">
         {stage === "group" ? (
           <>
-            <StandingsTable label="A" rows={groupStandings(state, "A")} group="A" state={state} />
             <StandingsTable
-              label="B"
+              title="KUMPULAN A"
+              rows={groupStandings(state, "A")}
+              group="A"
+              state={state}
+            />
+            <StandingsTable
+              title="KUMPULAN B"
               rows={groupStandings(state, "B")}
               group="B"
               state={state}
               gold
             />
-            <StandingsTable label="C" rows={groupStandings(state, "C")} group="C" state={state} />
+            <StandingsTable
+              title="KUMPULAN C"
+              rows={groupStandings(state, "C")}
+              group="C"
+              state={state}
+            />
             <div className="callout">
               <span className="diamond" />
               <p>
@@ -141,9 +153,14 @@ export default function KedudukanTab({ state }) {
           </>
         ) : state.xyDraw ? (
           <>
-            <StandingsTable label="X" rows={xyStandings(state, "X")} group="X" state={state} />
             <StandingsTable
-              label="Y"
+              title="PERINGKAT X"
+              rows={xyStandings(state, "X")}
+              group="X"
+              state={state}
+            />
+            <StandingsTable
+              title="PERINGKAT Y"
               rows={xyStandings(state, "Y")}
               group="Y"
               state={state}
