@@ -330,6 +330,56 @@
   color: var(--gold);
 }
 
+.shootout-info {
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.shootout-warn {
+  font: 600 11.5px/1.4 Barlow, sans-serif;
+  color: #ff6b5f;
+  margin-bottom: 6px;
+}
+
+.shootout-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font: 600 12.5px Barlow, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.shootout-row:first-of-type {
+  border-top: none;
+}
+
+.shootout-row span:first-child,
+.shootout-row span:last-child {
+  flex: 1;
+}
+
+.shootout-row span:last-child {
+  text-align: right;
+}
+
+.shootout-score {
+  flex: none;
+  font: 700 12.5px Oswald, sans-serif;
+  color: var(--gold);
+  text-align: center;
+}
+
+.shootout-result {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font: 700 12px Barlow, sans-serif;
+  color: var(--gold);
+}
+
 .callout {
   display: flex;
   align-items: center;
