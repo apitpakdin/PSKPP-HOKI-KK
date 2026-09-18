@@ -24,17 +24,24 @@ Pages, Netlify, Vercel, or an S3 bucket) — it's a client-only SPA using
 ## How it works
 
 Scores, match status, quarters, the XY draw, and tie-break results live in a
-single React context (`src/state/TournamentContext.jsx`) and are persisted to
-the browser's `localStorage`. This part has **no backend** — it's a single
-shared instance meant to run on one device (or one Wi-Fi-connected laptop)
-that the urusetia controls at the turf; the mobile screens and dashboard
-sync only because they're the same web app reading the same local storage.
+single React context (`src/state/TournamentContext.jsx`), persisted to the
+browser's `localStorage` as before, but also mirrored to a single shared row
+in Supabase (`tournament_state`, `id = 'main'`) so every open browser --
+urusetia's dashboard and every participant's phone -- sees the same live
+score/status the instant it changes anywhere, via Supabase Realtime. Row
+Level Security means only a signed-in urusetia session's write actually
+lands; a participant's browser only ever reads. `localStorage` remains as a
+same-device fallback (e.g. briefly offline) and to survive a page reload
+before the initial fetch completes.
 
-Pasukan & pemain and Pengadil are the exception: they're backed by a
-Supabase project (`src/lib/supabase.js`) so an Excel upload from the
-secretariat is visible to every visitor, not just the uploading browser. See
-`supabase/schema.sql` for the table/RLS setup. The `/dashboard` route
-requires signing in via Supabase Auth.
+Pasukan & pemain, Pengadil, and the live tournament state are all backed by
+this same Supabase project (`src/lib/supabase.js`) so an Excel upload or a
+score update from the secretariat is visible to every visitor, not just the
+originating browser. See `supabase/schema.sql` for the table/RLS setup --
+**running it (including the `tournament_state` table and its
+`supabase_realtime` publication) is a required one-time step in the
+Supabase SQL Editor**, it isn't applied automatically by deploying the app.
+The `/dashboard` route requires signing in via Supabase Auth.
 
 `src/state/standings.js` implements two procedures that both deliberately
 require manual input for anything decided by a physical event, rather than
@@ -69,9 +76,3 @@ keep running the X/Y format rather than rebuild to match Peraturan 8.2's
 bracket — not an oversight, and now confirmed by the official schedule
 itself.
 
-## Known gaps to fill in before the real event
-
-- No real-time multi-device sync for scores/matches — the dashboard and
-  mobile app only agree because they share one browser's `localStorage`. If
-  score entry needs to happen live from multiple devices, that data would
-  need to move to Supabase too (like players/referees already have).

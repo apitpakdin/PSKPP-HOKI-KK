@@ -35,3 +35,26 @@ create policy "authenticated write players" on players for all
 create policy "authenticated write referees" on referees for all
   using (auth.role() = 'authenticated')
   with check (auth.role() = 'authenticated');
+
+-- Live match state (scores, status, quarter/clock, XY draw, tie-breaks,
+-- shootouts) as a single shared row, so every visitor's phone sees the same
+-- live updates the urusetia dashboard makes -- not just whichever browser
+-- made the change. Only ever one row, id = 'main'.
+create table if not exists tournament_state (
+  id text primary key,
+  data jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table tournament_state enable row level security;
+
+create policy "public read tournament_state" on tournament_state for select using (true);
+
+create policy "authenticated write tournament_state" on tournament_state for all
+  using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
+
+-- Enables realtime change notifications for this table (Database > Replication
+-- in the Supabase dashboard does the same thing) so every open browser
+-- receives updates the instant urusetia saves a score.
+alter publication supabase_realtime add table tournament_state;

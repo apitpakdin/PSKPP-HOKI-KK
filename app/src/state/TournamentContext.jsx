@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
+import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from "react";
+import { supabase } from "../lib/supabase";
 import {
   QUARTER_SECONDS,
   finalSeed,
@@ -18,6 +19,7 @@ import {
 } from "./standings";
 
 const STORAGE_KEY = "pskpp-hoki-2026";
+const REMOTE_ID = "main";
 
 const TournamentStateContext = createContext(null);
 const TournamentDispatchContext = createContext(null);
@@ -59,29 +61,34 @@ function mergeScheduleList(freshList, savedList) {
   return freshList.map((fresh) => mergeProgress(fresh, savedById[fresh.id]));
 }
 
+// Spread a saved/incoming snapshot over a fresh initialState() so one from
+// before a field (e.g. thirdPlace, tiebreaks, shootouts) existed still loads
+// instead of wiping all progress. `teams` and the match schedule (saturday/
+// sunday/thirdPlace/final structure) are always forced fresh from seed.js --
+// they're fixed source-of-truth data no reducer action mutates, so a stale
+// copy (e.g. times/fixture order from before a jadual fix, whether from an
+// old localStorage save or an old client's write to the shared Supabase row)
+// must never win over the current source of truth. Only each match's own
+// live progress is carried over.
+function withCorrectedSchedule(parsed) {
+  return {
+    ...initialState(),
+    ...parsed,
+    teams,
+    saturday: mergeScheduleList(saturdaySeed(), parsed.saturday),
+    sunday: mergeScheduleList(sundaySeed(parsed.xyDraw ?? null), parsed.sunday),
+    thirdPlace: mergeProgressWithTeams(thirdPlaceSeed(), parsed.thirdPlace),
+    final: mergeProgressWithTeams(finalSeed(), parsed.final),
+  };
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return initialState();
     const parsed = JSON.parse(raw);
     if (!parsed || !parsed.saturday || !parsed.final) return initialState();
-    // Spread over a fresh initialState() so a save from before a field (e.g.
-    // thirdPlace, tiebreaks, shootouts) existed still loads instead of
-    // wiping all progress. `teams` and the match schedule (saturday/sunday/
-    // thirdPlace/final structure) are always forced fresh from seed.js --
-    // they're fixed source-of-truth data no reducer action mutates, so an
-    // old save's copy (e.g. times/fixture order from before a jadual fix)
-    // must never win over the current source of truth. Only each match's
-    // own live progress is carried over from the save.
-    return {
-      ...initialState(),
-      ...parsed,
-      teams,
-      saturday: mergeScheduleList(saturdaySeed(), parsed.saturday),
-      sunday: mergeScheduleList(sundaySeed(parsed.xyDraw ?? null), parsed.sunday),
-      thirdPlace: mergeProgressWithTeams(thirdPlaceSeed(), parsed.thirdPlace),
-      final: mergeProgressWithTeams(finalSeed(), parsed.final),
-    };
+    return withCorrectedSchedule(parsed);
   } catch {
     return initialState();
   }
@@ -221,6 +228,10 @@ function baseReducer(state, action) {
     case "RESET": {
       return initialState();
     }
+    case "SYNC_REMOTE": {
+      if (!action.state || !action.state.saturday || !action.state.final) return state;
+      return withCorrectedSchedule(action.state);
+    }
     default:
       return state;
   }
@@ -228,10 +239,77 @@ function baseReducer(state, action) {
 
 export function TournamentProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, undefined, () => syncDerivedTeams(loadState()));
+  // Set right before dispatching SYNC_REMOTE so the push-effect below skips
+  // that render -- otherwise every incoming update would immediately be
+  // pushed straight back out, echoing forever between every open browser.
+  const skipNextPush = useRef(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  // Push this device's state to the shared Supabase row so every other open
+  // browser (urusetia and every peserta phone) can see it live. RLS only
+  // lets an authenticated (signed-in urusetia) session's write actually
+  // land -- a peserta browser's attempt is silently rejected, which is fine,
+  // it only ever needs to read. Debounced slightly so a burst of changes in
+  // the same tick (e.g. a score click plus the next TICK) coalesces into one
+  // request instead of several.
+  useEffect(() => {
+    if (skipNextPush.current) {
+      skipNextPush.current = false;
+      return;
+    }
+    const timeout = setTimeout(() => {
+      supabase
+        .from("tournament_state")
+        .upsert({ id: REMOTE_ID, data: state })
+        .then(
+          () => {},
+          () => {},
+        );
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [state]);
+
+  // Mirror the shared row: fetch its current value once on mount, then
+  // subscribe so every score/status change urusetia makes anywhere reaches
+  // this device within moments, live.
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from("tournament_state")
+      .select("data")
+      .eq("id", REMOTE_ID)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data?.data) {
+          skipNextPush.current = true;
+          dispatch({ type: "SYNC_REMOTE", state: data.data });
+        }
+      })
+      .catch(() => {});
+
+    const channel = supabase
+      .channel("tournament_state_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tournament_state", filter: `id=eq.${REMOTE_ID}` },
+        (payload) => {
+          if (payload.new?.data) {
+            skipNextPush.current = true;
+            dispatch({ type: "SYNC_REMOTE", state: payload.new.data });
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => dispatch({ type: "TICK" }), 1000);
