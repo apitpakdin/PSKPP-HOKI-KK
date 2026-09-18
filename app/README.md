@@ -1,6 +1,6 @@
-# PSKPP Hoki Guru Perak 2026
+# Liga Hoki Guru Perak 2026
 
-Working app for Kejohanan Jemputan PSKPP Hoki Guru Perak 2026 (19–20 Sept 2026,
+Working app for Kejohanan Jemputan Liga Hoki Guru Perak 2026 (19–20 Sept 2026,
 Turf USAS, Kuala Kangsar), implemented from the Claude Design mockup
 `Hoki PSKPP Perak.dc.html` (variants **1a** dark mobile app and **1c**
 committee dashboard).

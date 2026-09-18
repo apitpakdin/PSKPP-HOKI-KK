@@ -55,7 +55,7 @@ export async function generateCertificateBlob({ name, teamName }) {
   ctx.fillText("SIJIL PENYERTAAN", WIDTH / 2, 260);
 
   ctx.font = `600 30px ${BARLOW}`;
-  ctx.fillText("PSKPP HOKI GURU PERAK 2026", WIDTH / 2, 305);
+  ctx.fillText("LIGA HOKI GURU PERAK 2026", WIDTH / 2, 305);
 
   ctx.strokeStyle = "#e8b21e";
   ctx.lineWidth = 3;
@@ -84,7 +84,7 @@ export async function generateCertificateBlob({ name, teamName }) {
   ctx.font = `500 26px ${BARLOW}`;
   ctx.fillText(`daripada pasukan ${teamName}`, WIDTH / 2, 615);
   ctx.fillText(
-    "atas penyertaan dalam Kejohanan Jemputan PSKPP Hoki Guru Perak 2026,",
+    "atas penyertaan dalam Kejohanan Jemputan Liga Hoki Guru Perak 2026,",
     WIDTH / 2,
     660,
   );
@@ -103,7 +103,7 @@ export async function generateCertificateBlob({ name, teamName }) {
 
   ctx.fillStyle = "rgba(18,41,26,0.5)";
   ctx.font = `500 18px ${BARLOW}`;
-  ctx.fillText("Kejohanan Jemputan PSKPP Hoki Guru Perak 2026", WIDTH / 2, HEIGHT - 112);
+  ctx.fillText("Kejohanan Jemputan Liga Hoki Guru Perak 2026", WIDTH / 2, HEIGHT - 112);
 
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
 }

@@ -58,9 +58,9 @@ export default function JadualTab({ state }) {
   return (
     <>
       <header className="mobile-header">
-        <div className="mobile-eyebrow">JEMPUTAN PSKPP</div>
+        <div className="mobile-eyebrow">KEJOHANAN JEMPUTAN</div>
         <div className="mobile-title">
-          HOKI GURU PERAK <span style={{ color: "var(--gold)" }}>2026</span>
+          LIGA HOKI GURU PERAK <span style={{ color: "var(--gold)" }}>2026</span>
         </div>
         <div className="mobile-subtitle">Turf USAS, Kuala Kangsar</div>
       </header>

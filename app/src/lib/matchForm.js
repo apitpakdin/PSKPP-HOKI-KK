@@ -76,7 +76,7 @@ function fillGameSheet(ws, { number, dateStr, time, groupLabel, teamAName, teamB
   ws.columns = COL_WIDTHS.map((width) => ({ width }));
 
   merge(ws, 0, 1, 0, TOTAL_COLS);
-  cell(ws, 0, 0, "KEJOHANAN JEMPUTAN PSKPP", { size: 13 });
+  cell(ws, 0, 0, "KEJOHANAN JEMPUTAN LIGA", { size: 13 });
   merge(ws, 1, 2, 0, TOTAL_COLS);
   cell(ws, 1, 0, "HOKI GURU PERAK 2026", { size: 12, bold: true });
   merge(ws, 2, 3, 0, TOTAL_COLS);

@@ -1,4 +1,4 @@
-// Seed data for Kejohanan Jemputan PSKPP Hoki Guru Perak 2026, matching the
+// Seed data for Kejohanan Jemputan Liga Hoki Guru Perak 2026, matching the
 // official "Jadual Perlawanan Jemputan Hoki PSKPP Guru Negeri Perak 2026"
 // (Sabtu 19 Sept: group stage; Ahad 20 Sept: Peringkat XY, tempat ke-3/4,
 // and final).

@@ -13,7 +13,7 @@ export default function Sidebar({ active, onSelect }) {
       <div>
         <div className="dash-brand-eyebrow">URUSETIA</div>
         <div className="dash-brand-title">
-          PSKPP HOKI
+          LIGA HOKI
           <br />
           GURU PERAK
         </div>

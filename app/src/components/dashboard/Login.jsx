@@ -29,7 +29,7 @@ export default function Login() {
     <div className="login-shell">
       <form className="login-card" onSubmit={submit}>
         <div className="dash-brand-eyebrow">URUSETIA</div>
-        <div className="login-title">Log masuk PSKPP HOKI</div>
+        <div className="login-title">Log masuk LIGA HOKI</div>
         <input
           type="email"
           placeholder="Emel"

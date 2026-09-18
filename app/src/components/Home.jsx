@@ -27,7 +27,7 @@ export default function Home() {
           KEJOHANAN JEMPUTAN
         </div>
         <div style={{ font: "700 36px/1 Oswald, sans-serif", marginTop: 8 }}>
-          PSKPP HOKI <span style={{ color: "var(--gold)" }}>GURU PERAK</span> 2026
+          LIGA HOKI <span style={{ color: "var(--gold)" }}>GURU PERAK</span> 2026
         </div>
       </div>
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>

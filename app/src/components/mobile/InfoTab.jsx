@@ -13,7 +13,7 @@ export default function InfoTab() {
       <div className="info-hero">
         <div className="mobile-eyebrow">KEJOHANAN JEMPUTAN</div>
         <div className="info-title">
-          PSKPP HOKI
+          LIGA HOKI
           <br />
           <span className="accent">GURU PERAK</span> 2026
         </div>
