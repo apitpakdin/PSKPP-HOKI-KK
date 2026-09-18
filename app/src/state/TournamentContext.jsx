@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import {
   QUARTER_SECONDS,
@@ -276,7 +276,24 @@ function baseReducer(state, action) {
 }
 
 export function TournamentProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, undefined, () => syncDerivedTeams(loadState()));
+  const [state, rawDispatch] = useReducer(reducer, undefined, () => syncDerivedTeams(loadState()));
+  // Every open tab (urusetia AND every read-only peserta phone) receives
+  // every remote update and, before this flag existed, re-pushed whatever
+  // it received right back up as a "new" revision -- a pure echo, since the
+  // content was unchanged. Harmless in isolation, but when two tabs are
+  // both doing this, one tab's echo of an OLDER state can land *after* a
+  // genuinely newer edit from another tab (a race on wall-clock push time,
+  // not on content), silently reverting it -- e.g. tapping a shootout "+"
+  // and having it immediately bounce back to 0. `dispatch` (the one every
+  // component actually calls) marks the change local before handing off to
+  // the real reducer dispatch; `rawDispatch` is used only for applying a
+  // remote sync, which must never be mistaken for a local edit worth
+  // echoing back.
+  const isLocalChange = useRef(false);
+  const dispatch = useCallback((action) => {
+    if (action.type !== "SYNC_REMOTE") isLocalChange.current = true;
+    rawDispatch(action);
+  }, []);
   // Highest revision (a Date.now() timestamp) this device has accepted,
   // whether from its own confirmed push or a remote update. A delayed/
   // out-of-order update from *before* a newer local change (e.g. urusetia
@@ -322,10 +339,20 @@ export function TournamentProvider({ children }) {
   // own revision counter and make it start ignoring urusetia's real,
   // legitimately-older-looking updates. Debounced slightly so a burst of
   // changes in the same tick (e.g. a score click plus the next TICK)
-  // coalesces into one request instead of several.
+  // coalesces into one request instead of several. The debounce timer lives
+  // in its own ref rather than the effect's cleanup, deliberately: a remote
+  // sync re-runs this effect too (state changed), and if that re-run's
+  // cleanup cancelled whatever timer a real local edit had just started,
+  // the local edit's push would silently vanish -- only a genuinely new
+  // local change is allowed to replace a pending one.
+  const pushTimeout = useRef(null);
   useEffect(() => {
+    if (!isLocalChange.current) return; // remote-sync-triggered state change -- never echo it back up
+    isLocalChange.current = false;
     pendingFloor.current = Date.now();
-    const timeout = setTimeout(() => {
+    if (pushTimeout.current) clearTimeout(pushTimeout.current);
+    pushTimeout.current = setTimeout(() => {
+      pushTimeout.current = null;
       const rev = Date.now();
       pendingSelfRevs.current.add(rev);
       supabase
@@ -341,8 +368,11 @@ export function TournamentProvider({ children }) {
           },
         );
     }, 300);
-    return () => clearTimeout(timeout);
   }, [state]);
+
+  useEffect(() => () => {
+    if (pushTimeout.current) clearTimeout(pushTimeout.current);
+  }, []);
 
   // Mirror the shared row: fetch its current value once on mount, then
   // subscribe so every score/status change urusetia makes anywhere reaches
@@ -382,7 +412,10 @@ export function TournamentProvider({ children }) {
         // exists yet (the very first load).
         return;
       }
-      dispatch({ type: "SYNC_REMOTE", state: remoteState });
+      // rawDispatch, deliberately not the wrapped `dispatch` -- this is a
+      // remote-originated change and must never be treated as a local edit
+      // worth echoing back up (see isLocalChange above).
+      rawDispatch({ type: "SYNC_REMOTE", state: remoteState });
     };
 
     const fetchNow = () => {
@@ -426,7 +459,7 @@ export function TournamentProvider({ children }) {
   useEffect(() => {
     const interval = setInterval(() => dispatch({ type: "TICK" }), 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [dispatch]);
 
   return (
     <TournamentStateContext.Provider value={state}>
