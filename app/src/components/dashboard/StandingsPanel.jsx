@@ -129,7 +129,10 @@ export default function StandingsPanel({ state }) {
             <thead>
               <tr>
                 <th className="stand-name">Pasukan</th>
+                <th>Main</th>
                 <th>Menang</th>
+                <th>Seri</th>
+                <th>Kalah</th>
                 <th>Beza Gol</th>
                 <th>Gol</th>
                 <th>Mata</th>
@@ -142,7 +145,10 @@ export default function StandingsPanel({ state }) {
                     {r.name}
                     {r.needsShootout ? " ⚠" : ""}
                   </td>
+                  <td>{r.played}</td>
                   <td>{r.won}</td>
+                  <td>{r.draw}</td>
+                  <td>{r.lost}</td>
                   <td>{r.gd}</td>
                   <td>{r.gf}</td>
                   <td className="stand-pts">{r.pts}</td>

@@ -6,14 +6,17 @@ function StandingsTable({ label, rows, gold }) {
     <div className="standings-group">
       <div className={`standings-head ${gold ? "gold" : ""}`}>
         <span>KUMPULAN {label}</span>
-        <span>M · S · JG · MT</span>
+        <span>M · MG · K · BG · MT</span>
       </div>
       {rows.map((r, i) => (
         <div key={r.id} className={`standings-row ${i < 2 ? "qualified" : ""}`}>
           <span className="standings-rank">{i + 1}</span>
-          <span className="standings-name">{r.name}</span>
+          <span className="standings-name">
+            {r.name}
+            {r.needsShootout ? " ⚠" : ""}
+          </span>
           <span className="standings-meta">
-            {r.played} · {r.won} · {r.gd >= 0 ? `+${r.gd}` : r.gd}
+            {r.played} · {r.won} · {r.lost} · {r.gd >= 0 ? `+${r.gd}` : r.gd}
           </span>
           <span className="standings-pts">{r.pts}</span>
         </div>
