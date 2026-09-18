@@ -323,6 +323,15 @@ export function TournamentProvider({ children }) {
         }
         if (_rev <= lastRev.current) return; // stale/duplicate, ignore
         lastRev.current = _rev;
+      } else if (lastRev.current > 0) {
+        // No _rev on this payload at all (e.g. a leftover/legacy row shape,
+        // or another tab still running code from before _rev existed) --
+        // once a real revision baseline is established, never let an
+        // unversioned payload override it; that's exactly the kind of
+        // stale overwrite that made a score tap look like it needed a
+        // second press to "stick". Only accepted before any baseline
+        // exists yet (the very first load).
+        return;
       }
       dispatch({ type: "SYNC_REMOTE", state: remoteState });
     };
