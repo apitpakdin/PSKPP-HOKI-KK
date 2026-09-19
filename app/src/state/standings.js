@@ -145,26 +145,20 @@ export function saturdayComplete(state) {
   return state.saturday.every((m) => m.status === "finished");
 }
 
-// Builds the X/Y draw from the actual physical draw results the secretariat
-// enters (which group's johan/naib landed in which slot), rather than
-// randomising it — the real draw is a lot-drawing ceremony, not a coin flip
-// the app should simulate.
-export function buildXYDraw(state, { groupToX1, groupToY1, groupToY2, x2Group }) {
-  const groups = ["A", "B", "C"];
-  const johan = {};
-  const naib = {};
-  groups.forEach((g) => {
+// The six group qualifiers (johan + naib johan of A/B/C) the secretariat
+// assigns freely to X1/X2/X3/Y1/Y2/Y3 -- the real draw is a physical lot
+// ceremony whose procedure the committee can change at any time (e.g. a
+// last-minute decision to draw all six slots individually instead of
+// johan-first/naib-auto-fill), so the app must accept whatever the actual
+// draw produced rather than assume one fixed procedure.
+export function xyQualifiers(state, groups = ["A", "B", "C"]) {
+  return groups.flatMap((g) => {
     const table = groupStandings(state, g);
-    johan[g] = table[0].id;
-    naib[g] = table[1].id;
+    return [
+      { id: table[0]?.id, group: g, rank: "johan" },
+      { id: table[1]?.id, group: g, rank: "naib" },
+    ];
   });
-
-  const x3Group = x2Group === groupToY1 ? groupToY2 : groupToY1;
-
-  return {
-    X: [johan[groupToX1], naib[x2Group], naib[x3Group]],
-    Y: [johan[groupToY1], johan[groupToY2], naib[groupToX1]],
-  };
 }
 
 export function xyStandings(state, side) {

@@ -1,23 +1,21 @@
 import { useState } from "react";
 import { teamName } from "../../lib/format";
-import { finalTeams, groupStandings, saturdayComplete, thirdPlaceTeams } from "../../state/standings";
+import { finalTeams, saturdayComplete, thirdPlaceTeams, xyQualifiers } from "../../state/standings";
 import { useTournamentDispatch } from "../../state/TournamentContext";
 
-const GROUPS = ["A", "B", "C"];
+const SLOT_KEYS = ["X1", "X2", "X3", "Y1", "Y2", "Y3"];
 
 export default function XYFlowPanel({ state }) {
   const dispatch = useTournamentDispatch();
   const complete = saturdayComplete(state);
-  const [groupToX1, setGroupToX1] = useState("A");
-  const [groupToY1, setGroupToY1] = useState("B");
-  const [groupToY2, setGroupToY2] = useState("C");
-  const [x2Pick, setX2Pick] = useState("B");
-  const x2Group = x2Pick === groupToY1 || x2Pick === groupToY2 ? x2Pick : groupToY1;
+  const qualifiers = xyQualifiers(state);
+  const [slots, setSlots] = useState({ X1: "", X2: "", X3: "", Y1: "", Y2: "", Y3: "" });
 
-  const johanName = (g) => teamName(state.teams, groupStandings(state, g)[0]?.id);
-  const naibName = (g) => teamName(state.teams, groupStandings(state, g)[1]?.id);
+  const chosenIds = SLOT_KEYS.map((k) => slots[k]).filter(Boolean);
+  const allFilled = SLOT_KEYS.every((k) => slots[k]);
+  const allDistinct = new Set(chosenIds).size === chosenIds.length;
+  const drawValid = allFilled && allDistinct;
 
-  const slotsDistinct = new Set([groupToX1, groupToY1, groupToY2]).size === 3;
   const canClearDraw = state.xyDraw && state.sunday.every((m) => m.status === "scheduled");
 
   if (!state.xyDraw) {
@@ -39,69 +37,44 @@ export default function XYFlowPanel({ state }) {
             className="draw-form"
             onSubmit={(e) => {
               e.preventDefault();
-              if (!slotsDistinct) return;
-              dispatch({ type: "RUN_DRAW", groupToX1, groupToY1, groupToY2, x2Group });
+              if (!drawValid) return;
+              dispatch({
+                type: "RUN_DRAW",
+                X: [slots.X1, slots.X2, slots.X3],
+                Y: [slots.Y1, slots.Y2, slots.Y3],
+              });
             }}
           >
             <p className="draw-help">
-              Masukkan keputusan cabutan undi johan kumpulan sebenar (bukan dijana secara rawak).
+              Masukkan keputusan cabutan undi sebenar bagi setiap slot -- pilih mana-mana johan
+              atau naib johan untuk mana-mana slot, ikut cabutan fizikal sebenar (bukan dijana
+              secara automatik).
             </p>
-            <div className="draw-row">
-              <label>X1</label>
-              <select value={groupToX1} onChange={(e) => setGroupToX1(e.target.value)}>
-                {GROUPS.map((g) => (
-                  <option key={g} value={g}>
-                    Johan Kump {g} · {johanName(g)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="draw-row">
-              <label>Y1</label>
-              <select value={groupToY1} onChange={(e) => setGroupToY1(e.target.value)}>
-                {GROUPS.map((g) => (
-                  <option key={g} value={g}>
-                    Johan Kump {g} · {johanName(g)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="draw-row">
-              <label>Y2</label>
-              <select value={groupToY2} onChange={(e) => setGroupToY2(e.target.value)}>
-                {GROUPS.map((g) => (
-                  <option key={g} value={g}>
-                    Johan Kump {g} · {johanName(g)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {!slotsDistinct && (
-              <div className="draw-error">
-                Setiap kumpulan (A, B, C) mesti diagihkan ke X1, Y1, Y2 secara berasingan.
-              </div>
-            )}
-            {slotsDistinct && (
-              <div className="draw-row">
-                <label>X2</label>
-                <select value={x2Group} onChange={(e) => setX2Pick(e.target.value)}>
-                  <option value={groupToY1}>
-                    Naib Johan {groupToY1} · {naibName(groupToY1)}
-                  </option>
-                  <option value={groupToY2}>
-                    Naib Johan {groupToY2} · {naibName(groupToY2)}
-                  </option>
+            {SLOT_KEYS.map((key) => (
+              <div className="draw-row" key={key}>
+                <label>{key}</label>
+                <select
+                  value={slots[key]}
+                  onChange={(e) => setSlots((s) => ({ ...s, [key]: e.target.value }))}
+                >
+                  <option value="">— pilih pasukan —</option>
+                  {qualifiers.map((q) => (
+                    <option
+                      key={q.id}
+                      value={q.id}
+                      disabled={chosenIds.includes(q.id) && slots[key] !== q.id}
+                    >
+                      {q.rank === "johan" ? "Johan" : "Naib Johan"} {q.group} ·{" "}
+                      {teamName(state.teams, q.id)}
+                    </option>
+                  ))}
                 </select>
               </div>
+            ))}
+            {allFilled && !allDistinct && (
+              <div className="draw-error">Setiap pasukan hanya boleh dipilih untuk satu slot.</div>
             )}
-            {slotsDistinct && (
-              <div className="draw-note">
-                Y3 auto: Naib Johan {groupToX1} · {naibName(groupToX1)}. X3 auto: Naib Johan{" "}
-                {groupToY1 === x2Group ? groupToY2 : groupToY1} ·{" "}
-                {naibName(groupToY1 === x2Group ? groupToY2 : groupToY1)}.
-              </div>
-            )}
-            <button className="btn-gold btn" type="submit" disabled={!slotsDistinct}>
+            <button className="btn-gold btn" type="submit" disabled={!drawValid}>
               Sahkan undian
             </button>
           </form>

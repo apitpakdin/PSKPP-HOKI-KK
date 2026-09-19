@@ -11,7 +11,6 @@ import {
 } from "./seed";
 import {
   buildShootoutFixtures,
-  buildXYDraw,
   finalTeams,
   saturdayComplete,
   shootoutStandings,
@@ -264,8 +263,13 @@ function baseReducer(state, action) {
     }
     case "RUN_DRAW": {
       if (!saturdayComplete(state) || state.xyDraw) return state;
-      const { groupToX1, groupToY1, groupToY2, x2Group } = action;
-      const draw = buildXYDraw(state, { groupToX1, groupToY1, groupToY2, x2Group });
+      // X/Y is whatever the secretariat keys in for the six qualifiers'
+      // actual physical draw -- no procedure is assumed or validated here
+      // beyond the shape, since the committee can change how the draw is
+      // run right up to the day itself.
+      const { X, Y } = action;
+      if (!Array.isArray(X) || X.length !== 3 || !Array.isArray(Y) || Y.length !== 3) return state;
+      const draw = { X, Y };
       return { ...state, xyDraw: draw, sunday: sundaySeed(draw) };
     }
     case "CLEAR_XY_DRAW": {
