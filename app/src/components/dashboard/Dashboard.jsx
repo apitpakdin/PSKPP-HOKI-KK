@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTournamentDispatch, useTournamentState } from "../../state/TournamentContext";
 import { useAuth } from "../../state/AuthContext";
@@ -34,8 +34,28 @@ export default function Dashboard() {
   const state = useTournamentState();
   const dispatch = useTournamentDispatch();
   const { signOut } = useAuth();
-  const [selectedId, setSelectedId] = useState(() => defaultSelection(state));
+  const [selectedId, setSelectedIdRaw] = useState(() => defaultSelection(state));
   const [view, setView] = useState("papan-skor");
+  // The lazy useState initializer above only ever runs once, using whatever
+  // `state` happens to be at that first render -- on a device that reloads
+  // before its local copy has caught up with the shared one (e.g. a laptop
+  // that just came back on and hasn't synced yet), that's stale data, and
+  // findMatch(state, selectedId) below always succeeds (match ids never
+  // disappear) so nothing ever re-picks a better default afterwards. Keep
+  // auto-following defaultSelection as state changes until the user
+  // actually touches the dropdown themselves.
+  const userPicked = useRef(false);
+  const setSelectedId = (id) => {
+    userPicked.current = true;
+    setSelectedIdRaw(id);
+  };
+  useEffect(() => {
+    if (userPicked.current) return;
+    setSelectedIdRaw((prev) => {
+      const next = defaultSelection(state);
+      return prev === next ? prev : next;
+    });
+  }, [state]);
 
   const found = findMatch(state, selectedId) ?? findMatch(state, defaultSelection(state));
 
