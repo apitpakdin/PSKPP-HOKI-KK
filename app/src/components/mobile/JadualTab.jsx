@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { teamName } from "../../lib/format";
+import { isTournamentSunday, teamName } from "../../lib/format";
 
 function MatchRow({ state, m }) {
   const teams = state.teams;
@@ -72,7 +72,7 @@ function MatchRow({ state, m }) {
 }
 
 export default function JadualTab({ state }) {
-  const [day, setDay] = useState("sat");
+  const [day, setDay] = useState(() => (isTournamentSunday() ? "sun" : "sat"));
   const list = day === "sat" ? state.saturday : [...state.sunday, state.thirdPlace, state.final];
 
   return (

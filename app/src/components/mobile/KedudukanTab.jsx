@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { teamName } from "../../lib/format";
+import { isTournamentSunday, teamName } from "../../lib/format";
 import { groupStandings, shootoutStandings, xyStandings } from "../../state/standings";
 
 // Tempat Ke-3/4 and the Final don't fit the standings-table shape (each is
@@ -153,7 +153,7 @@ function StandingsTable({ title, rows, gold, group, state }) {
 }
 
 export default function KedudukanTab({ state }) {
-  const [stage, setStage] = useState("group");
+  const [stage, setStage] = useState(() => (isTournamentSunday() && state.xyDraw ? "xy" : "group"));
   const done = state.saturday.filter((m) => m.status === "finished").length;
 
   return (
