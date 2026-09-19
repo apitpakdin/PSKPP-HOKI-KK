@@ -52,11 +52,12 @@ export const GROUP_ROUND_ROBIN_PAIRS = [
   [2, 0],
 ];
 
-// Ahad Peringkat XY order per the official jadual: 1v2, 3v1, 2v3.
+// Ahad Peringkat XY order per the official jadual (last-minute change):
+// 1v2, 2v3, 3v1.
 export const XY_ROUND_ROBIN_PAIRS = [
   [0, 1],
-  [2, 0],
   [1, 2],
+  [2, 0],
 ];
 
 export function saturdaySeed() {
