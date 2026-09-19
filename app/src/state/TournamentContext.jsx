@@ -84,6 +84,53 @@ function withCorrectedSchedule(parsed) {
   };
 }
 
+// How "decided" a match is, so an incoming remote snapshot can be checked
+// for whether it would un-finish or un-start a match relative to what this
+// device already knows -- the exact shape of a stale device's echo (e.g.
+// an old tab still running pre-fix code that keeps re-pushing whatever it
+// last had in memory, which can carry a newer wall-clock revision than a
+// genuinely fresher edit made moments later on another device).
+function matchRank(m) {
+  switch (m.status) {
+    case "finished":
+      return 3;
+    case "shootout":
+      return 2;
+    case "live":
+      return 1;
+    default:
+      return 0; // scheduled
+  }
+}
+
+function allMatchesOf(s) {
+  return [...(s.saturday ?? []), ...(s.sunday ?? []), s.thirdPlace, s.final].filter(Boolean);
+}
+
+// A genuine "Set semula" wipes every match back to scheduled at once -- the
+// one legitimate case where every match's rank drops, so it must never be
+// mistaken for a stale/corrupt push.
+function isFullReset(s) {
+  return (
+    allMatchesOf(s).every((m) => m.status === "scheduled") &&
+    !s.xyDraw &&
+    Object.keys(s.tiebreaks ?? {}).length === 0 &&
+    Object.keys(s.shootouts ?? {}).length === 0
+  );
+}
+
+// True if applying `incoming` would revert any match this device already
+// knows about to a less-decided state (finished -> live, live -> scheduled,
+// etc). No reducer action does this to a single match outside a full reset,
+// so it only ever happens when the state came from a stale/corrupt source.
+function hasRegression(current, incoming) {
+  const currentById = Object.fromEntries(allMatchesOf(current).map((m) => [m.id, m]));
+  return allMatchesOf(incoming).some((inc) => {
+    const cur = currentById[inc.id];
+    return cur && matchRank(inc) < matchRank(cur);
+  });
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -268,6 +315,12 @@ function baseReducer(state, action) {
     }
     case "SYNC_REMOTE": {
       if (!action.state || !action.state.saturday || !action.state.final) return state;
+      // Reject a sync that would un-finish or un-start a match this device
+      // already has more progress on -- a stale device can still carry a
+      // nominally "newer" revision than a genuinely fresher edit (see
+      // hasRegression above), and no normal action ever produces this shape
+      // except a full reset, which is always let through.
+      if (!isFullReset(action.state) && hasRegression(state, action.state)) return state;
       return withCorrectedSchedule(action.state);
     }
     default:
