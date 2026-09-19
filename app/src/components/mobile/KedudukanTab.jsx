@@ -169,15 +169,15 @@ export default function KedudukanTab({ state }) {
         </div>
       </header>
       <div className="day-toggle">
-        <button className={stage === "group" ? "active" : ""} onClick={() => setStage("group")}>
-          KUMPULAN
-        </button>
         <button
           className={stage === "xy" ? "active" : ""}
           onClick={() => setStage("xy")}
           disabled={!state.xyDraw}
         >
           PERINGKAT XY
+        </button>
+        <button className={stage === "group" ? "active" : ""} onClick={() => setStage("group")}>
+          KUMPULAN
         </button>
       </div>
       <div className="mobile-content">

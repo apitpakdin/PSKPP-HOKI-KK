@@ -85,11 +85,11 @@ export default function JadualTab({ state }) {
         <div className="mobile-subtitle">Turf USAS, Kuala Kangsar</div>
       </header>
       <div className="day-toggle">
-        <button className={day === "sat" ? "active" : ""} onClick={() => setDay("sat")}>
-          SAB · 19 SEPT
-        </button>
         <button className={day === "sun" ? "active" : ""} onClick={() => setDay("sun")}>
           AHD · 20 SEPT
+        </button>
+        <button className={day === "sat" ? "active" : ""} onClick={() => setDay("sat")}>
+          SAB · 19 SEPT
         </button>
       </div>
       <div className="mobile-content">
